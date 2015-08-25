@@ -49,7 +49,7 @@ void	nulluser()
 
 	sysinit();
 
-	kprintf("\n\r%s\n\n\r", VERSION);
+	// kprintf("\n\r%s\n\n\r", VERSION);
 	
 	/* Output Xinu memory layout */
 	free_mem = 0;
