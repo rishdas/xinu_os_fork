@@ -8,7 +8,7 @@ XINUPATH  = ../../
 
 HOSTCC    = gcc -Wall -pedantic -DTEXT_BASE=0xBFC00000 -DUSE_HOSTCC -O -I.
 
-include ${XINUPATH}/compile/mipsVars
+# include ${XINUPATH}/compile/mipsVars
 
 ${MKIMAGEUTIL}: crc32.c mkimage.c
 	${HOSTCC} ${HOSTCCFLAGS} $^ -o $@

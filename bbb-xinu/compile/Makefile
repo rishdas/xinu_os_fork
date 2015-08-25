@@ -102,9 +102,9 @@ export
 
 xinu:	Makefile rebuild $(BLDDIRS) $(DEFSFILE) $(DEPSFILE) $(CONFH) $(CONFC) $(LD_LIST)
 	@echo;echo 'Loading object files to produce xinu'
-	@$(LD) $(LDFLAGS) $(LD_LIST) -o $(XINU) -L../cross_compiler/lib/gcc/arm-none-eabi/4.8.1/ -lgcc
+	@$(LD) $(LDFLAGS) $(LD_LIST) -o $(XINU) -L/l/arm2/devtools/lib/gcc/arm-none-eabi/4.8.4 -lgcc
 	@$(OBJCOPY) -O binary $(XINU) $(XINUBIN)
-	@mkimage -A arm -O linux -T kernel -C none -a 0x81000000 -e 0x81000000 -d $(XINUBIN) $(XINUBOOT)
+	@./uboot-tool/mkimage -A arm -O linux -T kernel -C none -a 0x81000000 -e 0x81000000 -d $(XINUBIN) $(XINUBOOT)
 
 $(BLDDIRS): 
 	@mkdir -p $(BLDDIRS)
