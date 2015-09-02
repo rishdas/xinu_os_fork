@@ -18,14 +18,17 @@ void	netstart (void)
 
 	/* Force system to use DHCP to obtain an address */
 
-	kprintf("...using dhcp to obtain an IP address\n");
-	ipaddr = getlocalip();
-	if (ipaddr == SYSERR) {
-		panic("Error: could not obtain an IP address\n\r");
-	}
+	/* kprintf("...using dhcp to obtain an IP address\n"); */
+	/* ipaddr = getlocalip(); */
+	ipaddr=0xC0A80165;
+	/* if (ipaddr == SYSERR) { */
+	/* 	panic("Error: could not obtain an IP address\n\r"); */
+	/* } */
 	kprintf("\nIP address is %d.%d.%d.%d   (0x%08x)\n\r",
 		(ipaddr>>24)&0xff, (ipaddr>>16)&0xff, (ipaddr>>8)&0xff,
 		ipaddr&0xff,ipaddr);
+	NetData.ipmask = 0xFFFFFF00;
+	NetData.iprouter = 0xC0A80101;
 
 	kprintf("Subnet mask is %d.%d.%d.%d and router is %d.%d.%d.%d\n\r",
 		(NetData.ipmask>>24)&0xff, (NetData.ipmask>>16)&0xff,

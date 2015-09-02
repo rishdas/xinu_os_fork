@@ -35,7 +35,9 @@ process	main(void)
 	//kprintf("Counter value: %d\n", gcounter);
 
 	//DELAY(5000000);
-	netstart();
+
+	// Commented by Bryce Himebaugh on 9/02/1015. Generating run time error messages. 
+	// netstart();
 
 	kprintf("\n...creating a shell\n");
 	recvclr();

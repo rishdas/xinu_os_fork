@@ -8,8 +8,7 @@
 #									#
 #########################################################################
 
-# COMPILER_ROOT	=	../cross_compiler/bin/arm-none-eabi-
-COMPILER_ROOT	=	/l/arm2/devtools/bin/arm-none-eabi-
+COMPILER_ROOT	=	arm-none-eabi-
 
 PNAME		=	bbb
 PLAT		=	Platform_$(PNAME)
@@ -102,7 +101,7 @@ export
 
 xinu:	Makefile rebuild $(BLDDIRS) $(DEFSFILE) $(DEPSFILE) $(CONFH) $(CONFC) $(LD_LIST)
 	@echo;echo 'Loading object files to produce xinu'
-	@$(LD) $(LDFLAGS) $(LD_LIST) -o $(XINU) -L/l/arm2/devtools/lib/gcc/arm-none-eabi/4.8.4 -lgcc
+	@$(LD) $(LDFLAGS) $(LD_LIST) -o $(XINU) -L/usr/lib/gcc/arm-none-eabi/4.9.3 -lgcc
 	@$(OBJCOPY) -O binary $(XINU) $(XINUBIN)
 	@./uboot-tool/mkimage -A arm -O linux -T kernel -C none -a 0x81000000 -e 0x81000000 -d $(XINUBIN) $(XINUBOOT)
 
@@ -138,6 +137,9 @@ clean:
 	@rm -f $(XINU)
 	@rm -f $(XINUBIN)
 	@rm -f $(XINUBOOT)
+
+install: xinu
+	cp xinu.boot /tftpboot
 
 #--------------------------------------------------------------------------------
 # Locations of source directories and exceptions (.c and .[sS] files to exclude)
