@@ -7,6 +7,5 @@ void consumer(int count)
   //print consumed value e.g. consumed : 8
     while (n <= count) {
 	printf("consumed : %d", n);
-	n--;
     }
 }
