@@ -28,7 +28,7 @@ shellcmd xsh_prodcons(int nargs, char *args[])
       if (nargs == 2)
 	count = atoi (args[1]);
       
-
+      n = 0;
       //create the process producer and consumer and put them in ready queue.
       //Look at the definations of function create and resume in exinu/system folder for reference.      
       resume( create(producer, 1024, 20, "producer", 1, count) );
