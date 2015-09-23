@@ -1,0 +1,15 @@
+Does your program output garbage ? if yes why?
+
+Ans : Yes the program outputs garbage. Producer seems to get the greater chunk of CPU cycles because it has CPU operations(eg arithmatic ops). Because consumer just has an IO operation it tends to get less CPU cycles. The printf statement seems to be character based hence it gets interleaved.
+
+Are all the produced values getting consumed ? Check your program for small count like 20
+
+No. The consumer starts to run after the producer has produced 13 elements. And we see garbage as consumer's printf statement starts to take CPU cycles but character by character.
+
+Lucas:
+xsh_prodcons.c
+producer.c
+
+Sirshak:
+consumer.c
+Report_Assignment2
