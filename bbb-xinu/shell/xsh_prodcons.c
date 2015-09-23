@@ -15,12 +15,12 @@ shellcmd xsh_prodcons(int nargs, char *args[])
 	}
       
       if ((nargs == 2) && (strncmp(args[1], "--help", 7)) == 0) {
-	printf("Use: %s  name\n\n", args[0]);
+	printf("Use: %s  [Integer]\n\n", args[0]);
 	printf("Description:\n");
-	printf("\tDisplay a friendly message\n");
+	printf("\tProduces and consumes numbers\n");
 	printf("Options:\n");
 	printf("\t--help\t display this help and exit\n");
-	printf("\tname\t the message addressed person's name\n");
+	printf("\t[Integer]\t count (default:2000)\n");
 	return 0;
       }
 

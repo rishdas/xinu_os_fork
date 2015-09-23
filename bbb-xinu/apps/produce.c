@@ -7,8 +7,8 @@ void producer(int count)
   //print produced value e.g. produced : 8
 
   while (n <= count) {
-    n++;
     printf ("produced: %d\n",n);
+    n++;
   }
 
 };
