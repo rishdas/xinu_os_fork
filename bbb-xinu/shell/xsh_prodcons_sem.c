@@ -2,7 +2,7 @@
 
 int n; 
 int buf[15];
-int S=0;  
+int S=1;  
  //Definition for global variable 'n'
 /*Now global variable n will be on Heap so it is accessible all the processes i.e. consume and produce*/
 void wait_pc(int S)
@@ -23,15 +23,15 @@ void producer_sem(int count)
   //print produced value e.g. produced : 8
     int i = 0;
     while(n <= count) {
-	wait_pc(S);
+	wait(S);
 	i = 0;
 	while (n <= count && i<15) {
 	    n++;
 	    buf[i]=n;
-	    printf("Produced Value :%d", buf[i]);
+	    printf("Produced Value :%d\n", buf[i]);
 	    i++;
 	}
-	signal_pc(S);
+	signal(S);
     }
 
 };
@@ -42,17 +42,17 @@ void consumer_sem(int count)
   // of n is less than or equal to count
   //print consumed value e.g. consumed : 8
     int j = 0;
-    wait_pc(S);
-    while (j < 15) {
-	printf("consumed : %d", buf[j]);
+    wait(S);
+    while (j < 15 && n <= count) {
+	printf("consumed : %d\n", buf[j]);
 	j++;
     }
-    signal_pc(S);
+    signal(S);
 }
 
 shellcmd xsh_prodcons_sem(int nargs, char *args[])
 {
-      int count = 2000;             //local varible to hold count
+      int count = 20;             //local varible to hold count
 
       //Argument verifications and validations
       if (nargs > 2)
