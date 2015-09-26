@@ -1,59 +1,17 @@
-#include <prodcons.h>
+#include <xinu.h>
+#include <stdlib.h>
 
-int n; 
+void producer_sem(int );
+void consumer_sem(int );
+
+sid32 sem0, sem1;
 int buf[15];
-int S=1;  
- //Definition for global variable 'n'
-/*Now global variable n will be on Heap so it is accessible all the processes i.e. consume and produce*/
-void wait_pc(int S)
-{
-    while(S>0){
-	;
-    }
-    S++;
-}
-void signal_pc(int S)
-{
-    S--;
-}
-void producer_sem(int count)
-{
-  //Code to produce values less than equal to count, 
-  //produced value should get assigned to global variable 'n'.
-  //print produced value e.g. produced : 8
-    int i = 0;
-    while(n <= count) {
-	wait(S);
-	i = 0;
-	while (n <= count && i<15) {
-	    n++;
-	    buf[i]=n;
-	    printf("Produced Value :%d\n", buf[i]);
-	    i++;
-	}
-	signal(S);
-    }
-
-};
-
-void consumer_sem(int count)
-{
-  //Code to consume values of global variable 'n' until the value
-  // of n is less than or equal to count
-  //print consumed value e.g. consumed : 8
-    int j = 0;
-    wait(S);
-    while (j < 15 && n <= count) {
-	printf("consumed : %d\n", buf[j]);
-	j++;
-    }
-    signal(S);
-}
+int n;
 
 shellcmd xsh_prodcons_sem(int nargs, char *args[])
 {
-      int count = 20;             //local varible to hold count
-
+      int count = 2000;             //local varible to hold count
+      
       //Argument verifications and validations
       if (nargs > 2)
 	{
@@ -62,12 +20,12 @@ shellcmd xsh_prodcons_sem(int nargs, char *args[])
 	}
       
       if ((nargs == 2) && (strncmp(args[1], "--help", 7)) == 0) {
-	printf("Use: %s  name\n\n", args[0]);
+	printf("Use: %s  [Integer]\n\n", args[0]);
 	printf("Description:\n");
-	printf("\tprodcon sem impl\n");
+	printf("\tprodcons semaphore implementation\n");
 	printf("Options:\n");
 	printf("\t--help\t display this help and exit\n");
-	printf("\tname\t the message addressed person's name\n");
+	printf("\t[Integer]\t count value (default 2000)\n");
 	return 0;
       }
 
@@ -76,10 +34,46 @@ shellcmd xsh_prodcons_sem(int nargs, char *args[])
 	count = atoi (args[1]);
       
       n = 0;
-      //create the process producer and consumer and put them in ready queue.
-      //Look at the definations of function create and resume in exinu/system folder for reference.      
+
+      sem0 =  semcreate(0);
+      sem1 = semcreate(1);
+
       resume( create(producer_sem, 1024, 20, "producer_sem", 1, count) );
       resume( create(consumer_sem, 1024, 20, "consumer_sem", 1, count) );
 
       return 0;
+}
+
+void producer_sem(int count)
+{
+  //Code to produce values less than equal to count, 
+  //produced value should get assigned to global variable 'n'.
+  //print produced value e.g. produced : 8
+  int i;
+  while(n < count) {
+    wait(sem1);
+    i = 0;
+    while (n < count && i < 15){
+      buf[i]=n;
+      printf("Produced Value :%d\n", buf[i]);
+      n++;
+      i++;
+    }
+    signal(sem0);
+  } 
+};
+
+void consumer_sem(int count)
+{
+  //Code to consume values of global variable 'n' until the value
+  // of n is less than or equal to count
+  //print consumed value e.g. consumed : 8
+  int j;
+  wait(sem0);
+  j = 0;
+  while (j < 15 && n <= count) {
+    printf("consumed : %d\n", buf[j]);
+    j++;
+  }
+  signal(sem1);
 }
