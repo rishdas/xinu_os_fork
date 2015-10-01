@@ -1,24 +1,26 @@
-xsh $ produced: 2
-consumed : 2
-produced: 3
-consumed : 3
-produced: 4
-consumed : 4
-produced: 5
-consumed : 5
-produced: 6
-consumed : 6
-produced: 7
-consumed : 7
-produced: 8
-consumed : 8
-produced: 9
-consumed : 9
-produced: 10
-consumed : 10
-
 How exactly is sychronization achieved using semaphore in our assignnment?
 
+We use semaphore  to control access to a shared  (global) variable. We
+use two semaphore in order to  guarantee the accessing order of shared
+variable. The first semaphore, "producedsem", blocks the access to the
+variable by  the consumer,  until producer  signals consumer  to start
+consuming, post that  consumer after consuming can  signal producer to
+start producing using the "consumedsem" semaphore.
 
 
-Can the above sychronization be achieved with just one semphore? Why or why not? 
+Can the above sychronization be achieved with just one semphore? Why
+or why not?
+
+No it can't. Because there's no  guarantee on which thread might start
+first, blocking the  other thread. In order to guarantee  the order of
+execution of threads you have to use two semaphores.
+
+Lucas:
+Added semaphores
+Fixed issues in produce.c
+Wrote report
+
+Sirshak:
+Wrote the barebone of produce.c and consume.c
+Did testing
+Wrote report
