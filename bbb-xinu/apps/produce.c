@@ -12,5 +12,5 @@ void producer(int count)
 	printf ("produced: %d\n",n);
 	signal(producedsem);
     }
-
+    if (n == count) semdelete (consumedsem);
 }

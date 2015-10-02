@@ -10,4 +10,5 @@ void consumer(int count)
 	printf("consumed : %d\n", n);
 	signal(consumedsem);
     }
+    if (n == count) semdelete (producedsem);
 }
