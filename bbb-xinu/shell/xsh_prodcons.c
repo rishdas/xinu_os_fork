@@ -44,7 +44,7 @@ shellcmd xsh_prodcons(int nargs, char *args[])
 	return 0;
     }
 
-    if ((nargs == 1) && (strncmp (args[1], "-f",1)) == 0) {
+    if ((nargs == 2) && (strncmp (args[1], "-f",1)) == 0) {
       usefuture ();
       return 0;
     }

@@ -26,7 +26,7 @@ syscall future_get(
 	resched();
     }
     if (f->state == FUTURE_VALID) {
-	value = f->value;
+	*value = f->value;
 	f->state = FUTURE_EMPTY;
     }
     restore (mask);

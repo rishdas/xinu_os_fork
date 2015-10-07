@@ -11,9 +11,9 @@
 
 typedef struct futent
 {
-   int *value;		
-   int flag;		
-   int state;         	
+   int value;
+   int flag;
+   int state;
    pid32 pid;
 } future;
 
