@@ -5,7 +5,7 @@ syscall future_free(future *f)
 {
 
     syscall ret_val;
-    ret_val = freemem((char *)f, sizeof(*f));
+    ret_val = freemem((char *)f, sizeof(future));
     if(ret_val != OK) {
 	return SYSERR;
     }
