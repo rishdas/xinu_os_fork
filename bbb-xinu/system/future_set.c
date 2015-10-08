@@ -24,7 +24,6 @@ syscall future_set (
     if (f->state == FUTURE_WAITING) {
       f->value = *value;
       f->state = FUTURE_VALID;
-      /* ready (f->pid); */
     }
     restore (mask);
     return OK;

@@ -23,9 +23,6 @@ syscall future_get(
 	f->pid = currpid;
 	restore (mask);
 	return WAIT;
-	/* prptr = &proctab[currpid]; */
-	/* prptr->prstate = PR_WAIT; */
-	/* resched(); */
     }
     if (f->state == FUTURE_VALID) {
 	*value = f->value;
