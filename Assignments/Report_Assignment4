@@ -1,0 +1,6 @@
+Output:
+
+xsh $ prodcons -f
+it produced 0x810cc50c
+it produced 0x810cc51c
+xsh $ it produced 0x810cc52c

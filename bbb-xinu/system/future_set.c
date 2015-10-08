@@ -14,7 +14,7 @@ syscall future_set (
 	return SYSERR;
     }
     if (f->state == FUTURE_VALID) {
-      restore(mask);
+	restore(mask);
 	return SYSERR;
     }
     if (f->state == FUTURE_EMPTY) {
@@ -24,7 +24,7 @@ syscall future_set (
     if (f->state == FUTURE_WAITING) {
       f->value = *value;
       f->state = FUTURE_VALID;
-      ready (f->pid);
+      /* ready (f->pid); */
     }
     restore (mask);
     return OK;

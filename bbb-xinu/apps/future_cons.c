@@ -1,14 +1,21 @@
 #include <prodcons.h>
+#include <future.h>
 
 int future_cons(future *fut) {
 
   int i;
   int status;
-  status = future_get(fut, &i);
-  if (status < 1) {
-    printf("future_get failed\n");
-    return -1;
+  int is_cons = 0;
+  while (is_cons == 0) {
+      status = future_get(fut, &i);
+      if (status == SYSERR) {
+	  continue;
+      }
+      if (status == WAIT) {
+	  continue;
+      }
+      printf("it produced 0x%x\n", i);
+      is_cons = 1;
   }
-  printf("it produced 0x%x\n", i);
   return OK;
 }

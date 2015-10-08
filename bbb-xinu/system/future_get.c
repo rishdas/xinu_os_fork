@@ -15,15 +15,17 @@ syscall future_get(
 	return SYSERR;
     }
     if (f->state == FUTURE_WAITING) {
-      restore (mask);
+	restore (mask);
 	return SYSERR;
     }
     if (f->state == FUTURE_EMPTY) {
 	f->state = FUTURE_WAITING;
 	f->pid = currpid;
-	prptr = &proctab[currpid];
-	prptr->prstate = PR_WAIT;
-	resched();
+	restore (mask);
+	return WAIT;
+	/* prptr = &proctab[currpid]; */
+	/* prptr->prstate = PR_WAIT; */
+	/* resched(); */
     }
     if (f->state == FUTURE_VALID) {
 	*value = f->value;
