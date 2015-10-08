@@ -53,6 +53,7 @@ typedef	int32	status;		/* returned status value (OK/SYSERR)	*/
 #define	SYSERR	(-1)		/* system call failed			*/
 #define	EOF	(-2)		/* End-of-file (usually from read)	*/
 #define	TIMEOUT	(-3)		/* system call timed out		*/
+#define WAIT    (-4)            /* system call should busy wait         */
 
 extern	qid16	readylist;	/* global ID for list of ready processes*/
 

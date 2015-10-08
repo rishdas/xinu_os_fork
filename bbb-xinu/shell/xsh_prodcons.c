@@ -1,10 +1,28 @@
 #include <prodcons.h>
 
+local void usefuture (void);
+
 /*Definition for global variable 'n'*/
 int n;
 /*Now global variable n will be on Heap so it is accessible all the processes i.e. consume and produce*/
 
 sid32 producedsem, consumedsem;
+future *f1, *f2, *f3;
+
+local void usefuture (void)
+{
+
+  f1 = future_alloc(FUTURE_EXCLUSIVE);
+  f2 = future_alloc(FUTURE_EXCLUSIVE);
+  f3 = future_alloc(FUTURE_EXCLUSIVE);
+
+  resume( create(future_cons, 1024, 20, "fcons1", 1, f1) );
+  resume( create(future_prod, 1024, 20, "fprod1", 1, f1) );
+  resume( create(future_cons, 1024, 20, "fcons2", 1, f2) );
+  resume( create(future_prod, 1024, 20, "fprod2", 1, f2) );
+  resume( create(future_cons, 1024, 20, "fcons3", 1, f3) );
+  resume( create(future_prod, 1024, 20, "fprod3", 1, f3) );
+};
 
 shellcmd xsh_prodcons(int nargs, char *args[])
 {
@@ -24,6 +42,11 @@ shellcmd xsh_prodcons(int nargs, char *args[])
 	printf("\t--help\t display this help and exit\n");
 	printf("\t[Integer]\t count (default:2000)\n");
 	return 0;
+    }
+
+    if ((nargs == 2) && (strncmp (args[1], "-f",1)) == 0) {
+      usefuture ();
+      return 0;
     }
 
     //check args[1] if present assign value to count
