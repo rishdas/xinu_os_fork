@@ -1,0 +1,21 @@
+Output:
+
+xsh $ prodcons -f
+it produced 0xa005ef14
+it produced 0xa005e314
+it produced 0xa005e314
+it produced 0xa005e314
+it produced 0xa005e314
+it produced 0xa005e714
+it produced 0xa005e314
+xsh $ it produced i0xa005et714
+ produced 0xa005e314
+
+
+Sirshak Das:
+* Implemented the infra and FUTURE_SHARED
+* Helped debug on FUTURE_QUEUE
+
+Lucas Brasilino:
+* Help design the solution
+* Implemented the FUTURE_QUEUE
