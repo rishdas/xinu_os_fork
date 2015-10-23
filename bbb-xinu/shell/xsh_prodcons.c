@@ -42,9 +42,9 @@ local void usefuture (void)
   resume( create(future_prod, 1024, 20, "fprod5", 1, f_queue) );
   resume( create(future_prod, 1024, 20, "fprod6", 1, f_queue) );  
   
-  /* future_free(f_exclusive); */
-  /* future_free(f_shared); */
-
+  future_free(f_exclusive);
+  future_free(f_shared);
+  future_free(f_queue);
 };
 
 shellcmd xsh_prodcons(int nargs, char *args[])
