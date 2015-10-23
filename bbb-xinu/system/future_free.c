@@ -14,7 +14,7 @@ syscall future_free(fut32 fut
 	restore(mask);
 	return SYSERR;
     }
-    futptr = &futptr[fut];
+    futptr = &futtab[fut];
     if (futptr->state == FUTURE_UNUSED) {
 	restore(mask);
 	return SYSERR;
@@ -31,5 +31,6 @@ syscall future_free(fut32 fut
     }
     resched_cntl(DEFER_STOP);
     restore(mask);
+    resched();
     return OK;
 }
