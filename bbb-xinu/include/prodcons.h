@@ -8,7 +8,7 @@ extern int n; /*this is just declaration*/
 /*function Prototype*/
 void consumer(int count);
 void producer(int count);
-int future_prod(future *fut);
-int future_cons(future *fut);
+int future_prod(fut32 fut);
+int future_cons(fut32 fut);
 
 extern sid32 producedsem, consumedsem;
