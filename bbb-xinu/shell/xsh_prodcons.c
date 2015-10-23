@@ -7,25 +7,34 @@ int n;
 /*Now global variable n will be on Heap so it is accessible all the processes i.e. consume and produce*/
 
 sid32 producedsem, consumedsem;
-future *f1, *f2, *f3;
+fut32 f_exclusive, f_shared;
 
 local void usefuture (void)
 {
 
-  f1 = future_alloc(FUTURE_EXCLUSIVE);
-  f2 = future_alloc(FUTURE_EXCLUSIVE);
-  f3 = future_alloc(FUTURE_EXCLUSIVE);
+  f_exclusive = future_alloc(FUTURE_EXCLUSIVE);
+  f_shared = future_alloc(FUTURE_SHARED);
 
-  resume( create(future_cons, 1024, 20, "fcons1", 1, f1) );
-  resume( create(future_prod, 1024, 20, "fprod1", 1, f1) );
-  resume( create(future_cons, 1024, 20, "fcons2", 1, f2) );
-  resume( create(future_prod, 1024, 20, "fprod2", 1, f2) );
-  resume( create(future_cons, 1024, 20, "fcons3", 1, f3) );
-  resume( create(future_prod, 1024, 20, "fprod3", 1, f3) );
+
+  resume( create(future_cons, 1024, 20, 
+		 "fcons1", 1, f_exclusive) );
+  resume( create(future_prod, 1024, 20,
+		 "fprod1", 1, f_exclusive) );
+
+  resume( create(future_cons, 1024, 20,
+  		 "fcons2", 1, f_shared) );
+  resume( create(future_cons, 1024, 20,
+  		 "fcons3", 1, f_shared) );
+  resume( create(future_cons, 1024, 20,
+  		 "fcons4", 1, f_shared) );
+  resume( create(future_cons, 1024, 20,
+  		 "fcons5", 1, f_shared) );
+  resume( create(future_prod, 1024, 20,
+  		 "fprod1", 1, f_shared) );
   
-  future_free(f1);
-  future_free(f2);
-  future_free(f3);
+  /* future_free(f_exclusive); */
+  /* future_free(f_shared); */
+
 };
 
 shellcmd xsh_prodcons(int nargs, char *args[])

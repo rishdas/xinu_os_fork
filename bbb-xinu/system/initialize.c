@@ -19,6 +19,7 @@ extern	void meminit(void);	/* Initializes the free memory list	*/
 
 struct	procent	proctab[NPROC];	/* Process table			*/
 struct	sentry	semtab[NSEM];	/* Semaphore table			*/
+struct  futent  futtab[NFUTURES]; /* Futures  table                     */
 struct	memblk	memlist;	/* List of free memory blocks		*/
 
 /* Active system status */
@@ -111,6 +112,7 @@ static	void	sysinit()
 	int32	i;
 	struct	procent	*prptr;		/* Ptr to process table entry	*/
 	struct	sentry	*semptr;	/* Prr to semaphore table entry	*/
+	struct  futent  *futptr;        /* Ptr to future table entry    */
 
 	/* Platform Specific Initialization */
 
@@ -162,6 +164,17 @@ static	void	sysinit()
 		semptr->sstate = S_FREE;
 		semptr->scount = 0;
 		semptr->squeue = newqueue();
+	}
+	/*Intiatize futures*/
+	
+	for(i = 0; i < NFUTURES; i++) {
+	    futptr = &futtab[i];
+	    futptr->state = FUTURE_UNUSED;
+	    futptr->flag = FUTURE_EXCLUSIVE;
+	    futptr->get_queue = newqueue();
+	    futptr->set_queue = newqueue();
+	    futptr->get_count = 0;
+	    futptr->set_count = 0;
 	}
 
 	/* Initialize buffer pools */
