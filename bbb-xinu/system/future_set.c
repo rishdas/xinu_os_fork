@@ -20,6 +20,7 @@ syscall future_set (
     switch (f->flag) {
     case FUTURE_EXCLUSIVE:
     case FUTURE_SHARED:
+    case FUTURE_QUEUE:
     default:
 	if (f->state == FUTURE_VALID) {
 	    restore(mask);
@@ -30,6 +31,22 @@ syscall future_set (
     switch (f->flag) {
     case FUTURE_EXCLUSIVE:
     case FUTURE_SHARED:
+	if (f->state == FUTURE_EMPTY) {
+	    f->value = *value;
+	    f->state = FUTURE_VALID;
+	    return OK;
+	}
+	break;
+    case FUTURE_QUEUE:
+      if (f->state == FUTURE_EMPTY) {
+	f->set_count++;
+	prptr = &proctab[currpid];
+	prptr->prstate = PR_WAIT;
+	prptr->prfut = fut;
+	enqueue(currpid, f->set_queue);
+	restore (mask);
+	resched();
+      }
     default:
 	if (f->state == FUTURE_EMPTY) {
 	    f->value = *value;
@@ -56,18 +73,27 @@ syscall future_set (
 		/*Signal all procs in get Queue*/
 		p = getfirst(f->get_queue);
 		prptr = &proctab[p];
-		kprintf("Dequed: %s\n", prptr->prname);
 		ready(p);
 	    }
 	    resched_cntl(DEFER_STOP);
 	}
 	break;
+    case FUTURE_QUEUE:
+      if (f->state == FUTURE_WAITING) {
+	f->value = *value;
+	f->state = FUTURE_VALID;
+	if (f->get_count-- > 0){
+	  ready(getfirst(f->get_queue));
+	}
+      }
+      break;
     default:
 	if (f->state == FUTURE_WAITING) {
 	    f->value = *value;
 	    f->state = FUTURE_VALID;
-	    f->get_count--;
+	    if (f->get_count-- > 0){
 	    ready(getfirst(f->get_queue));
+	    }
 	}
 	break;
     }

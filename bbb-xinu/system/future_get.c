@@ -42,7 +42,6 @@ syscall future_get(
 	    prptr->prfut = fut;
 	    f->get_count++;
 	    enqueue(currpid, f->get_queue);
-	    kprintf("%s queued\n", prptr->prname);
 	    restore(mask);
 	    resched();
 	}
@@ -53,11 +52,26 @@ syscall future_get(
 	    prptr->prstate = PR_WAIT;
 	    prptr->prfut = fut;
 	    enqueue(currpid, f->get_queue);
-	    kprintf("%s queued\n", prptr->prname);
 	    restore (mask);
 	    resched();
 	}
 	break;
+    case FUTURE_QUEUE:
+      if (f->state == FUTURE_WAITING ||
+	  f->state == FUTURE_EMPTY) {
+	f->state = FUTURE_WAITING;
+        f->get_count++;
+	prptr = &proctab[currpid];
+	prptr->prstate = PR_WAIT;
+	prptr->prfut = fut;
+	enqueue (currpid, f->get_queue);
+	if (f->set_count-- > 0) {
+	  ready (getfirst (f->set_queue));
+	}
+	else
+	  resched();
+      }
+      break;
     default:
 	if (f->state == FUTURE_WAITING) {
 	    restore (mask);
@@ -78,6 +92,15 @@ syscall future_get(
 
     if (f->state == FUTURE_VALID) {
 	*value = f->value;
+	if (f->set_count-- > 0) {
+	  f->state = FUTURE_WAITING;
+	  ready(getfirst(f->set_queue));
+	} else {
+	  if (f->get_count > 0) {
+	    f->state = FUTURE_WAITING;
+	    resched();
+	  }
+	}
     }
     restore (mask);
     return OK;
