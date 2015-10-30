@@ -1,11 +1,8 @@
 #include <prodcons.h>
 
 int future_prod(fut32 fut) {
-  int i, j;
+  int j;
   j = (uint32)&fut%10;
-  /*   for (i=0; i<1000; i++) { */
-  /*   j += i; */
-  /* } */
   future_set(fut, &j);
   return OK;
 }
