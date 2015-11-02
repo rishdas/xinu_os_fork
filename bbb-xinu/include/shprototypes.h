@@ -84,3 +84,5 @@ extern  shellcmd  xsh_reset     (int32, char *[]);
 
 /* in file xsh_prodcons_sem.c */
 extern  shellcmd  xsh_prodcons_sem     (int32, char *[]);
+
+extern shellcmd xsh_printsize (int32, char *[]);
