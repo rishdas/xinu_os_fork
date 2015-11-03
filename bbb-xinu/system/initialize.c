@@ -121,7 +121,11 @@ static	void	sysinit()
 	/* Initialize the interrupt vectors */
 
 	initevec();
-	
+
+	/* Points to freemem */
+
+	fmptr = &freemem;
+
 	/* Initialize free memory list */
 	
 	meminit();
