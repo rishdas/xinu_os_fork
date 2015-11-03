@@ -341,6 +341,7 @@ extern	void	pdump(struct netpacket *);
 extern	void	pdumph(struct netpacket *);
 
 /* in file platinit.c */
+
 extern	void	platinit(void);
 
 /* in file ptclear.c */
