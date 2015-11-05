@@ -13,6 +13,7 @@ typedef	unsigned long long uint64;
 /* Xinu-specific types */
 
 typedef	int32	sid32;		/* semaphore ID				*/
+typedef int32   fut32;          /* future ID                            */
 typedef	int16	qid16;		/* queue ID				*/
 typedef	int32	pid32;		/* process ID				*/
 typedef	int32	did32;		/* device ID				*/
@@ -53,6 +54,7 @@ typedef	int32	status;		/* returned status value (OK/SYSERR)	*/
 #define	SYSERR	(-1)		/* system call failed			*/
 #define	EOF	(-2)		/* End-of-file (usually from read)	*/
 #define	TIMEOUT	(-3)		/* system call timed out		*/
+#define WAIT    (-4)            /* system call should busy wait         */
 
 extern	qid16	readylist;	/* global ID for list of ready processes*/
 

@@ -1,0 +1,19 @@
+Output:
+
+xsh $ prodcons -f
+it produced 0x810cc50c
+it produced 0x810cc51c
+xsh $ it produced 0x810cc52c
+
+Contributions:
+
+Sirshak Das:
+* Created the future skeleton
+* Corrected the future behaviour with busy wait
+* Tested the code
+
+Lucas Brasilino:
+* Created the test apps
+* Created the initial future behaviour with resched() and ready()
+* Tested the code
+* Report writing
