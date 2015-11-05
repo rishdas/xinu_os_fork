@@ -122,8 +122,11 @@ extern	syscall	getc(did32);
 /* in file getitem.c */
 extern	pid32	getfirst(qid16);
 
+/* in file getmem_no_free.c */
+extern  char    *getmem_no_free(uint32);
+ 
 /* in file getmem.c */
-extern	char	*getmem(uint32);
+extern	char	*getmem_free(uint32);
 
 /* in file getpid.c */
 extern	pid32	getpid(void);
@@ -131,8 +134,11 @@ extern	pid32	getpid(void);
 /* in file getprio.c */
 extern	syscall	getprio(pid32);
 
+/*in file getstk_no_free.c*/
+extern char  *getstk_no_free(uint32);
+
 /* in file getstk.c */
-extern	char	*getstk(uint32);
+extern	char	*getstk_free(uint32);
 
 /* in file gettime.c */
 extern	status	gettime(uint32 *);

@@ -122,9 +122,11 @@ static	void	sysinit()
 
 	initevec();
 
-	/* Points to freemem */
+	/* Initialize Low-Level Memory handlers*/
 
 	fmptr = &freemem;
+	gsptr = &getstk_free;
+	gmptr = &getmem_free;
 
 	/* Initialize free memory list */
 	

@@ -16,9 +16,13 @@ shellcmd xsh_freemem(int nargs, char *args[])
     }
     if (strncmp (args[1], "--enable",8) == 0) {
 	fmptr = &freemem;
+	gsptr = &getstk_free;
+	gmptr = &getmem_free;
     }
     else if (strncmp (args[1], "--disable",9) == 0 ) {
 	fmptr = &freenomem;
+	gsptr = &getstk_no_free;
+	gmptr = &getmem_no_free;
     }
     else
 	return SYSERR;
