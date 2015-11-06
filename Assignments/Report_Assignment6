@@ -61,6 +61,40 @@ available starts to decrease each time a  process is created. When it is enabled
 back, the memory  space is freed back  and so we are continuing  having the sabe
 amount of free memory to use.
 
+* Alternative implementation
+
+This implementation is commited to a different branch in our repository named as
+discussionclass with  commit hash  code aafd0d0318ff99ab205fca9ed30d75fcbbcc0ce7
+This replaces  the getmem getstk and  free completely and that  is applicable to
+system wide.  As this would affect the  other Exercises we decided to do that in
+a separate branch.  This basically removes  queueing of memory chunks because it
+does not  have to  free any memory.   So in this  implementation stk  and memory
+space is  allocated from  the big  chunk reducing  its size  and thus  having no
+provision to free the space.  
+The sizes of the new allocation routines
+freemem.c : 15 lines Old size: 70 lines
+getmem.c : 40 lines  Old size: 50 lines
+getstk.c : 40 lines  Old size: 52 lines
+The  iteration in  the code  has significantly  reduce which  would make  things
+faster although inefficient.  This can be  further reduced as now the getmem and
+getstk have more or less the same code but with diffrent return value.
+Output
+------
+xsh $ hello
+hello: too few arguments
+Free Mem: 4294752800
+xsh $ hello Sirshak
+Hello Sirshak, Welcome to the world of Xinu!!
+Free Mem: 4294744608
+xsh $ hello
+hello: too few arguments
+Free Mem: 4294736416
+xsh $ hello
+hello: too few arguments
+Free Mem: 4294728224
+-------------------
+As you can see the free memory is decreasing
+
 * Exercise 9.7
 
 We  created two  system function  called stkstamp()  and stkusedsize()  at stk.c
