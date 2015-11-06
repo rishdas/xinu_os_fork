@@ -17,7 +17,7 @@ shellcmd xsh_print_free(int nargs, char *args[])
     memptr = memlist.mnext;
     while (memptr != NULL)
     {
-	printf("Address:%x\tLength:%u\n", memptr, 
+	printf("Address:0x%x\tLength:%u\n", memptr, 
 	       memptr->mlength);
 	memptr = memptr->mnext;
     }
