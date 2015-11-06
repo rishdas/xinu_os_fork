@@ -24,7 +24,7 @@ syscall	kill(
 	if (--prcount <= 1) {		/* Last user process completes	*/
 		xdone();
 	}
-
+	printf("Free Mem: %u\n", memlist.mlength);
 	send(prptr->prparent, pid);
 	for (i=0; i<3; i++) {
 		close(prptr->prdesc[i]);
