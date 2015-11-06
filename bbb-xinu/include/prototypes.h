@@ -108,6 +108,11 @@ extern	syscall	freebuf(char *);
 /* in file freemem.c */
 extern	syscall	freemem(char *, uint32);
 
+/* in file freenomem.c */
+extern	syscall	freenomem(char *, uint32);
+
+extern  syscall (*fmptr) (char *,  uint32 );
+
 /* in file getbuf.c */
 extern	char	*getbuf(bpid32);
 
@@ -117,8 +122,11 @@ extern	syscall	getc(did32);
 /* in file getitem.c */
 extern	pid32	getfirst(qid16);
 
+/* in file getmem_no_free.c */
+extern  char    *getmem_no_free(uint32);
+ 
 /* in file getmem.c */
-extern	char	*getmem(uint32);
+extern	char	*getmem_free(uint32);
 
 /* in file getpid.c */
 extern	pid32	getpid(void);
@@ -126,8 +134,11 @@ extern	pid32	getpid(void);
 /* in file getprio.c */
 extern	syscall	getprio(pid32);
 
+/*in file getstk_no_free.c*/
+extern char  *getstk_no_free(uint32);
+
 /* in file getstk.c */
-extern	char	*getstk(uint32);
+extern	char	*getstk_free(uint32);
 
 /* in file gettime.c */
 extern	status	gettime(uint32 *);
@@ -336,6 +347,7 @@ extern	void	pdump(struct netpacket *);
 extern	void	pdumph(struct netpacket *);
 
 /* in file platinit.c */
+
 extern	void	platinit(void);
 
 /* in file ptclear.c */
@@ -531,6 +543,10 @@ extern	syscall	signaln(sid32, int32);
 /* in file sleep.c */
 extern	syscall	sleepms(uint32);
 extern	syscall	sleep(uint32);
+
+/* in file stk.c */
+extern void stkstamp(char *, uint32);
+extern uint32 stkusedsize(char *, uint32);
 
 /* in file start.S */
 extern	int32	inb(int32);

@@ -121,7 +121,13 @@ static	void	sysinit()
 	/* Initialize the interrupt vectors */
 
 	initevec();
-	
+
+	/* Initialize Low-Level Memory handlers*/
+
+	fmptr = &freemem;
+	gsptr = &getstk_free;
+	gmptr = &getmem_free;
+
 	/* Initialize free memory list */
 	
 	meminit();

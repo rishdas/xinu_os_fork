@@ -82,3 +82,8 @@ extern  shellcmd  xsh_prodcons     (int32, char *[]);
 /* in file xsh_reset.c */
 extern  shellcmd  xsh_reset     (int32, char *[]);
 
+/* in file xsh_print_free.c */
+extern  shellcmd  xsh_print_free   (int32, char *[]);
+
+/* in file xsh_freemem.c */
+extern  shellcmd  xsh_freemem    (int32, char *[]);

@@ -6,9 +6,9 @@
  *  getstk  -  Allocate stack memory, returning highest word address
  *------------------------------------------------------------------------
  */
-char  	*getstk_free(
-	  uint32	nbytes		/* Size of memory requested	*/
-	)
+char  	*getstk_no_free(
+                        uint32  nbytes		/* Size of memory requested	*/
+                       )
 {
 	intmask	mask;			/* Saved interrupt mask		*/
 	struct	memblk	*prev, *curr;	/* Walk through memory list	*/
@@ -31,6 +31,7 @@ char  	*getstk_free(
 		if (curr->mlength >= nbytes) {	/* Record block address	*/
 			fits = curr;		/*   when request fits	*/
 			fitsprev = prev;
+			break;
 		}
 		prev = curr;
 		curr = curr->mnext;

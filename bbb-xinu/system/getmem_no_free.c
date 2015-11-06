@@ -6,7 +6,7 @@
  *  getmem  -  Allocate heap storage, returning lowest word address
  *------------------------------------------------------------------------
  */
-char  	*getmem_free(
+char  	*getmem_no_free(
 	  uint32	nbytes		/* Size of memory requested	*/
 	)
 {

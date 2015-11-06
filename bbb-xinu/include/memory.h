@@ -13,11 +13,23 @@
  *  freestk  --  Free stack memory allocated by getstk
  *----------------------------------------------------------------------
  */
+/*
 #define	freestk(p,len)	freemem((char *)((uint32)(p)		\
 				- ((uint32)roundmb(len))	\
 				+ (uint32)sizeof(uint32)),	\
 				(uint32)roundmb(len) )
+*/
 
+syscall (*fmptr) (char *,  uint32 );
+char  *(*gsptr) (uint32);
+char  *(*gmptr) (uint32);
+
+#define	freestk(p,len)	fmptr((char *)((uint32)(p)		\
+				- ((uint32)roundmb(len))	\
+				+ (uint32)sizeof(uint32)),	\
+				(uint32)roundmb(len) )
+#define getstk(s) gsptr((uint32)s)
+#define getmem(s) gmptr((uint32)s)
 struct	memblk	{			/* See roundmb & truncmb	*/
 	struct	memblk	*mnext;		/* Ptr to next free memory blk	*/
 	uint32	mlength;		/* Size of blk (includes memblk)*/

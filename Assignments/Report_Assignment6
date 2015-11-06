@@ -1,0 +1,131 @@
+* Exercise 9.1:
+
+- Demo of functionality:
+
+xsh $ print_free
+Address:0x810545e0	Length:519641632
+
+$ hello Lucas
+Hello Lucas, Welcome to the world of Xinu!!
+
+$ print_free
+Address:0x810545e0	Length:519641632
+
+xsh $ hello Sirshak
+Hello Sirshak, Welcome to the world of Xinu!!
+
+xsh $ print_free
+Address:0x810545e0	Length:519641632
+
+* Exercise 9.4:
+
+We  developed  an  application  called  "freemem",  that  enables  and  disables
+system-wide memory unallocation. The Xinu  system boots with memory unallocation
+enabled as default.
+
+- Demo of functionality
+
+The previous commands were done with the default unallocation procedure. Now, we
+will disable memory unallocation:
+
+xsh $ freemem --disable
+
+xsh $ hello Lucas
+Hello Lucas, Welcome to the world of Xinu!!
+
+xsh $ print_free   
+Address:0x810545e0	Length:519625248
+
+xsh $ hello Sirshak
+Hello Sirshak, Welcome to the world of Xinu!!
+
+xsh $ print_free
+Address:0x810545e0	Length:519608864
+
+xsh $ freemem --enable
+
+xsh $ hello Lucas
+Hello Lucas, Welcome to the world of Xinu!!
+
+xsh $ print_free
+Address:0x810545e0	Length:519600672
+
+xsh $ hello Sirshak
+Hello Sirshak, Welcome to the world of Xinu!!
+
+xsh $ print_free
+Address:0x810545e0	Length:519600672
+
+As  you  can see  above,  if  the unallocation  in  disabled,  the memory  space
+available starts to decrease each time a  process is created. When it is enabled
+back, the memory  space is freed back  and so we are continuing  having the sabe
+amount of free memory to use.
+
+* Alternative implementation
+
+This implementation is commited to a different branch in our repository named as
+discussionclass with  commit hash  code aafd0d0318ff99ab205fca9ed30d75fcbbcc0ce7
+This replaces  the getmem getstk and  free completely and that  is applicable to
+system wide.  As this would affect the  other Exercises we decided to do that in
+a separate branch.  This basically removes  queueing of memory chunks because it
+does not  have to  free any memory.   So in this  implementation stk  and memory
+space is  allocated from  the big  chunk reducing  its size  and thus  having no
+provision to free the space.  
+The sizes of the new allocation routines
+freemem.c : 15 lines Old size: 70 lines
+getmem.c : 40 lines  Old size: 50 lines
+getstk.c : 40 lines  Old size: 52 lines
+The  iteration in  the code  has significantly  reduce which  would make  things
+faster although inefficient.  This can be  further reduced as now the getmem and
+getstk have more or less the same code but with diffrent return value.
+Output
+------
+xsh $ hello
+hello: too few arguments
+Free Mem: 4294752800
+xsh $ hello Sirshak
+Hello Sirshak, Welcome to the world of Xinu!!
+Free Mem: 4294744608
+xsh $ hello
+hello: too few arguments
+Free Mem: 4294736416
+xsh $ hello
+hello: too few arguments
+Free Mem: 4294728224
+-------------------
+As you can see the free memory is decreasing
+
+* Exercise 9.7
+
+We  created two  system function  called stkstamp()  and stkusedsize()  at stk.c
+file.  The first function is called by create() system call to "stamp" the stack
+area, from stack base to its length, with a 'mark' (STACKSTAMP). In turn, kill()
+system call calls  stkusedsize() to check how many stack  locations have changed
+before free the stack and terminate the process, printing the used stack size.
+
+xsh $ help   
+
+shell commands are:
+
+argecho      devdump      kill         sleep        ?            freemem      
+arp          echo         memdump      udp          hello        
+cat          exit         memstat      udpecho      prodcons     
+clear        help         ping         udpeserver   reset        
+date         ipaddr       ps           uptime       print_free   
+xsh $ 
+
+Process help used 403 bytes in stack.
+
+$ hello Sirshak
+Hello Sirshak, Welcome to the world of Xinu!!
+xsh $ 
+
+Process hello used 344 bytes in stack.
+
+xsh $ hello Lucas
+Hello Lucas, Welcome to the world of Xinu!!
+xsh $ 
+
+Process hello used 342 bytes in stack.
+
+
