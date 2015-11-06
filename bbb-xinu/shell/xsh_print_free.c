@@ -12,8 +12,6 @@ shellcmd xsh_print_free(int nargs, char *args[])
 	printf("\t--help\t display this help and exit\n");
 	return 0;
     }
-    printf ("Total free memory space: %u\n", memlist.mlength);
-    printf ("------------------------\n");
     memptr = memlist.mnext;
     while (memptr != NULL)
     {
