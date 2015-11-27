@@ -1,3 +1,4 @@
+<<<<<<< .merge_file_5hPPeD
 #include <prodcons.h>
 
 void consumer(int count)
@@ -12,3 +13,11 @@ void consumer(int count)
     }
     if (n == count) semdelete (producedsem);
 }
+=======
+#include <xinu.h>
+#include <prodcons.h>
+
+void consumer(int count) {
+}
+
+>>>>>>> .merge_file_l58XKC
