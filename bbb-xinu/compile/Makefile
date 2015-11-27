@@ -49,10 +49,6 @@ REBUILDFLAGS	=	-s $(TOPDIR)/system  debug.c 	\
 				'dhcp_dump*'  pxe.c		\
 			-s $(TOPDIR)/shell  'xsh_rdstest*'      \
 			-s $(TOPDIR)/apps
-<<<<<<< .merge_file_c94ziQ
-=======
-
->>>>>>> .merge_file_92hdpQ
 
 INCLUDE		=	-I$(TOPDIR)/include
 DEFS		= 	-DBSDURG -DVERSION=\""`cat $(VERSIONFILE)`"\"
