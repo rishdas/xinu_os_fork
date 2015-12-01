@@ -15,7 +15,7 @@ process	counterproc() {
 process	main(void)
 {
   char bbb_ipaddr[] = "192.168.1.101";
-  char bbb_router[] = "192.168.1.255";
+  char bbb_router[] = "192.168.1.254";
 
   /* Start the network */
   netstart(bbb_ipaddr,bbb_router);

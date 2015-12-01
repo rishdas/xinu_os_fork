@@ -53,7 +53,7 @@ pid32	create(
 	prptr->prparent = (pid32)getpid();
 	prptr->prhasmsg = FALSE;
 
-	stkstamp (prptr->prstkbase, prptr->prstklen);
+	/*stkstamp (prptr->prstkbase, prptr->prstklen);*/
 
 	/* set up initial device descriptors for the shell		*/
 	prptr->prdesc[0] = CONSOLE;	/* stdin  is CONSOLE device	*/
