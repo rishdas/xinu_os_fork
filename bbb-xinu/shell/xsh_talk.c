@@ -2,6 +2,7 @@
 
 #include <xinu.h>
 #include <stdio.h>
+#include <string.h>
 
 #define LINE_LEN 255
 
@@ -14,8 +15,9 @@ shellcmd xsh_talk(int nargs, char *args[]) {
     uint32 dst_ipaddr;
     uint16 dst_port;
     uint16 src_port;
-    uid32 slot;
-    char line[] = "Test UDP msg";
+    uint32 slot;
+    char in_line[LINE_LEN - 20];
+    char snd_line[LINE_LEN];
     uint32 recv_len;
     int retval;
     
@@ -40,8 +42,7 @@ shellcmd xsh_talk(int nargs, char *args[]) {
     return 0;
   }
 
-  dst_port = 7;
-  src_port = 50000;
+  dst_port = src_port = 100;
   
   if ((dot2ip (args[1], &dst_ipaddr)) == SYSERR ){
       printf ("%s: invalid IP address\n",args[0]);
@@ -54,36 +55,35 @@ shellcmd xsh_talk(int nargs, char *args[]) {
       return 1;
   }
   while (TRUE) {
-/*      
-      if ((recv_len = udp_recv (slot, line, LINE_LEN, 1000)) == SYSERR) {
+      
+      bzero (in_line,sizeof (in_line));
+      bzero (snd_line,LINE_LEN);
+	  if ((recv_len = udp_recv (slot, snd_line, sizeof(LINE_LEN), 1000)) == SYSERR) {
 	  printf ("%s: udp_recv() error\n",args[0]);
 	  return 1;
       }
       if (recv_len != TIMEOUT) {
-	  printf ("RECV_MSG: %s\n",line);
-      } else {
-	  printf ("udp_recv() TIMEOUT!\n");
-      }
-*/    
-/*
-      if ((recv_len = read (CONSOLE,line,LINE_LEN)) == SYSERR) {
+	  printf ("RECV_MSG: %s\n",snd_line);
+      } 
+      if ((recv_len = read (CONSOLE,in_line,sizeof (in_line))) == SYSERR) {
 	  printf ("%s: read() error\n",args[0]);
 	  return 1;
       }
-      if (*line == 'F') {
+      if (*in_line == '-') {
 	  break;
       }
-*/
-      recv_len = strnlen (line,LINE_LEN);
-      retval = udp_send (slot,line,recv_len);
+      strcpy (snd_line,in_line);
+      /* more than 20 chars hack */
+      if (recv_len < 20) {
+	  strncat (snd_line,"                    ",20);
+      }	  
+      recv_len = strnlen (snd_line,1200);
+      retval = udp_send (slot, snd_line, recv_len);
       
-      printf ("SEND_MSG: %s | len = %d\n",line,recv_len);
       if ( retval == SYSERR) {
 	  printf ("%s: udp_send() error\n",args[0]);
 	  return 1;
       }
-      break;
-      
   }
   
   udp_release (slot);
