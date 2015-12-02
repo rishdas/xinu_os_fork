@@ -42,8 +42,8 @@ static	void arp_dmp ()
 	/* Print entries from the ARP table */
 
 	printf("ARP cache:\n");
-	printf("   State Pid    IP Address    Hardware Address\n");
-	printf("   ----- --- --------------- -----------------\n");
+	printf("   State Pid    IP Address    Hardware Address Age\n");
+	printf("   ----- --- --------------- ----------------- ---\n");
 	for (i = 0; i < ARP_SIZ; i++) {
 		arptr = &arpcache[i];
 		if (arptr->arstate == AR_FREE) {
@@ -68,6 +68,7 @@ static	void arp_dmp ()
 		for (j = 1; j < ARP_HALEN; j++) {
 			printf(":%02X", arptr->arhaddr[j]);
 		}
+		printf (" %3d", (clktime - arptr->arptime));
 		printf("\n");
 	}
 	printf("\n");
