@@ -58,14 +58,17 @@ shellcmd xsh_talk(int nargs, char *args[]) {
       
       bzero (in_line,sizeof (in_line));
       bzero (snd_line,LINE_LEN);
-	  if ((recv_len = udp_recv (slot, snd_line, sizeof(LINE_LEN), 1000)) == SYSERR) {
+	  if ((recv_len = udp_recv (slot, snd_line, 
+				    LINE_LEN, 
+				    1000)) == SYSERR) {
 	  printf ("%s: udp_recv() error\n",args[0]);
 	  return 1;
       }
       if (recv_len != TIMEOUT) {
 	  printf ("RECV_MSG: %s\n",snd_line);
       } 
-      if ((recv_len = read (CONSOLE,in_line,sizeof (in_line))) == SYSERR) {
+      if ((recv_len = read (CONSOLE,in_line,
+			    sizeof (in_line))) == SYSERR) {
 	  printf ("%s: read() error\n",args[0]);
 	  return 1;
       }
