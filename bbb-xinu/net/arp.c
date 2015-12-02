@@ -371,7 +371,7 @@ void	arp_check(void)
 	
 	mask = disable ();
 
-	for (i=1; i<ARP_SIZ; i++) {	
+	for (i=0; i<ARP_SIZ; i++) {	
 	    arptr = &arpcache[i];
 	    if (arptr->arstate == AR_RESOLVED) { /* If state is RESOLVED */
 		if ((clktime - arptr->arptime) > 60) { /* and time elapsed more than 5 mins */
