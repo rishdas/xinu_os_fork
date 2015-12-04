@@ -366,15 +366,13 @@ void	arp_check(void)
 	int32	i;			/* ARP cache index		*/
 	struct	arpentry  *arptr;	/* Ptr to ARP cache entry	*/
 	intmask	mask;			/* Saved interrupt mask		*/
-
-	kprintf ("arp_check()\n");
 	
 	mask = disable ();
 
 	for (i=0; i<ARP_SIZ; i++) {	
 	    arptr = &arpcache[i];
 	    if (arptr->arstate == AR_RESOLVED) { /* If state is RESOLVED */
-		if ((clktime - arptr->arptime) > 60) { /* and time elapsed more than 5 mins */
+		if ((clktime - arptr->arptime) > 300) { /* and time elapsed more than 5 mins */
 		    arptr->arstate = AR_FREE;
 		    memset((char *)arptr, NULLCH, sizeof(struct arpentry));
 		}
