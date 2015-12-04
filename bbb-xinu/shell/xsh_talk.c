@@ -1,15 +1,15 @@
 /* xsh_talk.c - xsh_talk */
 
-#include <xinu.h>
-#include <stdio.h>
-#include <string.h>
+#include <talk.h>
 
-#define LINE_LEN 255
+
 
 /*------------------------------------------------------------------------
  * xsh_talk - Chat with someone
  *------------------------------------------------------------------------
  */
+
+
 shellcmd xsh_talk(int nargs, char *args[]) {
 
     uint32 dst_ipaddr;
@@ -19,8 +19,11 @@ shellcmd xsh_talk(int nargs, char *args[]) {
     char in_line[LINE_LEN - 20];
     char snd_line[LINE_LEN];
     uint32 recv_len;
+    int snd_len;
     int retval;
-    
+    fut32 f_talk;
+    pid32 print_proc;
+
   if (nargs < 2) 
     {
       fprintf (stderr, "%s: too few arguments\n", args[0]);
@@ -42,6 +45,12 @@ shellcmd xsh_talk(int nargs, char *args[]) {
     return 0;
   }
 
+  f_talk = future_alloc(FUTURE_EXCLUSIVE);
+  
+  print_proc = create(f_talk_print, 1024, 20,
+		      "f_talk_print", 1, f_talk);
+
+  resume(print_proc);
   dst_port = src_port = 100;
   
   if ((dot2ip (args[1], &dst_ipaddr)) == SYSERR ){
@@ -65,8 +74,11 @@ shellcmd xsh_talk(int nargs, char *args[]) {
 	  return 1;
       }
       if (recv_len != TIMEOUT) {
-	  printf ("RECV_MSG: %s\n",snd_line);
-      } 
+          snd_len = strlen(snd_line);
+          future_set_str(f_talk, 
+			 &snd_len, snd_line);
+      }
+      printf("Enter the message to send:\n");
       if ((recv_len = read (CONSOLE,in_line,
 			    sizeof (in_line))) == SYSERR) {
 	  printf ("%s: read() error\n",args[0]);
@@ -88,7 +100,7 @@ shellcmd xsh_talk(int nargs, char *args[]) {
 	  return 1;
       }
   }
-  
+  kill (print_proc);
   udp_release (slot);
   return 0;
 }

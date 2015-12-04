@@ -92,7 +92,7 @@ int vm_udp_talk_send(int ssock)
 {
     char buf[MAX_MESSAGE_LEN];
     printf("Enter the message to send:\n");
-    gets(buf);
+    fgets(buf, MAX_MESSAGE_LEN, stdin);
     if (sendto(ssock, buf, MAX_MESSAGE_LEN, 0,
 	       (struct sockaddr *)&peer_addr_sock, 
 	       sizeof(struct sockaddr)) < 0) {
