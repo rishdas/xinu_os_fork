@@ -12,7 +12,7 @@ void	arp_init(void)
 {
 	int32	i;			/* ARP cache index		*/
 
-	for (i=1; i<ARP_SIZ; i++) {	/* Initialize cache to empty	*/
+	for (i=0; i<ARP_SIZ; i++) {	/* Initialize cache to empty	*/
 		arpcache[i].arstate = AR_FREE;
 	}
 }
@@ -214,6 +214,7 @@ void	arp_in (
 		if (arptr->arstate == AR_PENDING) {
 			/* Mark resolved and notify waiting process */
 			arptr->arstate = AR_RESOLVED;
+			arptr->arptime = clktime;
 			send(arptr->arpid, OK);
 		}
 	}
@@ -372,9 +373,10 @@ void	arp_check(void)
 	for (i=0; i<ARP_SIZ; i++) {	
 	    arptr = &arpcache[i];
 	    if (arptr->arstate == AR_RESOLVED) { /* If state is RESOLVED */
-		if ((clktime - arptr->arptime) > 300) { /* and time elapsed more than 5 mins */
+		if ((clktime - arptr->arptime) > 60) { /* and time elapsed more than 5 mins */
 		    arptr->arstate = AR_FREE;
-		    memset((char *)arptr, NULLCH, sizeof(struct arpentry));
+		    arptr->arptime = 0;
+		    memset((char *)arptr, 0, sizeof(struct arpentry));
 		}
 	    }	    
 	}
