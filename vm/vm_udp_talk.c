@@ -22,7 +22,7 @@ void vm_udp_talk_bootstrap(int argc, char *argv[],
     struct sockaddr_in my_addr;
 
     if (argc < 2) {
-	perror("Few Arguments please enter the IP");
+	fprintf(stderr,"%s: please enter the IP\n",argv[0]);
 	exit (1);
     }
     peer_addr = gethostbyname(argv[1]);
