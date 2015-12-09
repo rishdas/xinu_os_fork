@@ -34,6 +34,56 @@ int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 /* YOUR CODE GOES HERE */
 
+int fs_read(int fd, void *buf, int nbytes)
+{
+    struct filetable *oftptr;
+    int blocksz;
+    int fileblock;
+    int offset;
+    int diskblock;
+    
+    
+    if ((fd < 0) || (fd > (NUM_FD-1))) {
+	printf ("Invalid file descriptor!\n");
+	return SYSERR;
+    }
+    if ((buf == NULL) || (nbytes < 1 )) {
+	return SYSERR;
+    }
+    
+    oftptr = &oft[fd];
+    if (oftptr->state == FSTATE_CLOSED) {
+	printf ("File descriptor not open!\n");
+	return SYSERR;
+    }
+    if (oftptr->fileptr >= ofptr->in.size) {
+	printf ("Attempted to read beyond EOF!\n");
+	return SYSERR;
+    }
+    /* if nbytes + 'cursor' > file size, */
+    /* then adjust nbytes to amount of bytes to the file's end */
+    if ((oftptr->fileptr + nbytes) > oftptr->in.size) {
+	nbytes = oftptr->in.size - oftptr->fileptr;
+    }
+
+    blocksz = fds.blocksz;
+    /* get the file block that the 'cursor' points */
+    fileblock = ofptr->fileptr / blocksz;
+    /* get the file offset */
+    offset = ofptr->fileptr % blocksz;
+    /* get the actual disk block */
+    diskblock = fs_fileblock_to_diskblock (0, fd, fileblock);
+    /* read the disk block */
+    if ( (bs_read (0, diskblock, offset, buf, nbytes)) == SYSERR ) {
+	printf ("bs_read() error!\n");
+	return SYSERR;
+    }
+    /* advances the 'cursor' */
+    ofptr->fileptr += nbytes;
+    
+    return nbytes;
+}
+
 int fs_close(int fd)
 {
     struct filetable *oftptr;
