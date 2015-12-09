@@ -13,6 +13,8 @@
 #define INODE_TYPE_FILE 1
 #define INODE_TYPE_DIR 2
 
+#define O_CREAT 0
+
 
 struct inode {
   int id;

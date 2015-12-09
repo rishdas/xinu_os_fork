@@ -56,7 +56,7 @@ int fs_read(int fd, void *buf, int nbytes)
 	printf ("File descriptor not open!\n");
 	return SYSERR;
     }
-    if (oftptr->fileptr >= ofptr->in.size) {
+    if (oftptr->fileptr >= oftptr->in.size) {
 	printf ("Attempted to read beyond EOF!\n");
 	return SYSERR;
     }
@@ -66,20 +66,21 @@ int fs_read(int fd, void *buf, int nbytes)
 	nbytes = oftptr->in.size - oftptr->fileptr;
     }
 
-    blocksz = fds.blocksz;
+    blocksz = fsd.blocksz;
     /* get the file block that the 'cursor' points */
-    fileblock = ofptr->fileptr / blocksz;
+    fileblock = oftptr->fileptr / blocksz;
     /* get the file offset */
-    offset = ofptr->fileptr % blocksz;
+    offset = oftptr->fileptr % blocksz;
     /* get the actual disk block */
     diskblock = fs_fileblock_to_diskblock (0, fd, fileblock);
     /* read the disk block */
-    if ( (bs_read (0, diskblock, offset, buf, nbytes)) == SYSERR ) {
+    if ( (bs_bread (0, diskblock, offset, buf, nbytes)) 
+	 == SYSERR ) {
 	printf ("bs_read() error!\n");
 	return SYSERR;
     }
     /* advances the 'cursor' */
-    ofptr->fileptr += nbytes;
+    oftptr->fileptr += nbytes;
     
     return nbytes;
 }
@@ -113,6 +114,47 @@ int fs_close(int fd)
 
     return OK;
 }
+int fs_find_file(char *filename)
+{
+    int i = 0;
+    for (i = 0; i < fsd.root_dir.numentries; i++) {
+	if (strncmp(fsd.root_dir.entry[i].name, 
+		    filename, strlen(filename)) == 0) {
+	    return i;
+	}
+    }
+    return -1;
+}
+
+int fs_create_file_inode(struct inode *in)
+{
+    fsd.inodes_used += 1;
+    in->id = fsd.inodes_used;
+    in->type = INODE_TYPE_FILE;
+    in->device = 0;
+    in->size = 0;
+    fs_put_inode_by_num(0, in->id, &in);
+    return OK;
+}
+int fs_create(char *filename, int mode)
+{
+    int ret_val = 0;
+    struct inode in;
+    if (mode != O_CREAT) {
+	return SYSERR;
+    }
+    ret_val = fs_find_file(filename);
+    if (ret_val >= 0) {
+	return SYSERR;
+    }
+    fs_create_file_inode(&in);
+    fsd.root_dir.numentries += 1;
+    fsd.root_dir.entry[fsd.root_dir.numentries-1].inode_num =
+	in.id;
+    strncpy(fsd.root_dir.entry[fsd.root_dir.numentries-1].name, 
+	    filename, strlen(filename));
+    return OK;
+}
 int fs_mount(int dev)
 {
     struct inode root_dir_inode;
@@ -121,7 +163,6 @@ int fs_mount(int dev)
 	printf("Unsupported device\n");
 	return SYSERR;
     }
-    fs_setmaskbit(FIRST_INODE_BLOCK+fsd.inodes_used);
     fsd.inodes_used += 1;
     fsd.root_dir.numentries = 1;
     fsd.root_dir.entry[0].inode_num = 
@@ -213,7 +254,9 @@ fs_put_inode_by_num(int dev, int inode_number, struct inode *in) {
   /*
   printf("in_no: %d = %d/%d\n", inode_number, bl, inn);
   */
-
+  if (fs_getmaskbit(bl) == 0) {
+      fs_setmaskbit(bl);
+  }
   bs_bread(dev0, bl, 0, block_cache, fsd.blocksz);
   memcpy(&block_cache[(inn*sizeof(struct inode))], in, sizeof(struct inode));
   bs_bwrite(dev0, bl, 0, block_cache, fsd.blocksz);
