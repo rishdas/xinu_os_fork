@@ -79,11 +79,12 @@ int vm_udp_talk_recv(int rsock)
 	return 0;
     }
     if (numfd) {
+	bzero (buf, MAX_MESSAGE_LEN);
 	recv_addr_len = sizeof(struct sockaddr_in);
 	ret_val = recvfrom(rsock, buf, MAX_MESSAGE_LEN, 
 			   0, (struct sockaddr *)&recv_addr,
 			   &recv_addr_len);
-	printf("Recieved from Xinu: %s\n", buf);
+	printf("Received from Xinu: %s\n", buf);
 	return ret_val;
     }
     return 1;
@@ -91,6 +92,8 @@ int vm_udp_talk_recv(int rsock)
 int vm_udp_talk_send(int ssock)
 {
     char buf[MAX_MESSAGE_LEN];
+
+    bzero (buf, MAX_MESSAGE_LEN);
     printf("Enter the message to send:\n");
     fgets(buf, MAX_MESSAGE_LEN, stdin);
     if (sendto(ssock, buf, MAX_MESSAGE_LEN, 0,

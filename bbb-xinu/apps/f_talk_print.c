@@ -3,7 +3,7 @@
 void print_str(char *print_buf, int len)
 {
     int i = 0;
-    printf("\nRecieved from Ubuntu: ");
+    printf("\nReceived from Ubuntu: ");
     for (i = 0; i<len; i++) {
 	printf("%c", print_buf[i]);
     }
