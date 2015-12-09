@@ -34,6 +34,17 @@ int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 /* YOUR CODE GOES HERE */
 
+int fs_get_next_free_data_block()
+{
+    int i = NUM_INODE_BLOCKS+2;//2 For Super and Freemask block
+    while (i<fsd.nblocks) {
+	if (fs_getmaskbit(i) == 0) {
+	    return i;
+	}
+	i++;
+    }
+    return SYSERR;
+}
 int fs_close(int fd)
 {
     struct filetable *oftptr;
@@ -49,6 +60,38 @@ int fs_close(int fd)
     }
     oftptr->state = FSTATE_CLOSED;
 
+    return OK;
+}
+int fs_mount(int dev)
+{
+    struct inode root_dir_inode;
+    int ret_val;
+    if (dev != 0) {
+	printf("Unsupported device\n");
+	return SYSERR;
+    }
+    fs_setmaskbit(FIRST_INODE_BLOCK+fsd.inodes_used);
+    fsd.inodes_used += 1;
+    fsd.root_dir.numentries = 1;
+    fsd.root_dir.entry[0].inode_num = 
+	fsd.inodes_used;
+    root_dir_inode.id = fsd.root_dir.entry[0].inode_num;
+    root_dir_inode.type = INODE_TYPE_DIR;
+    root_dir_inode.device = dev;
+    root_dir_inode.size = MDEV_BLOCK_SIZE;
+    ret_val = fs_get_next_free_data_block();
+    if (ret_val == SYSERR) {
+	return SYSERR;
+    }
+    fs_setmaskbit(ret_val);
+    root_dir_inode.blocks[
+	(root_dir_inode.size/MDEV_BLOCK_SIZE)-1] = ret_val;
+    fs_put_inode_by_num(0, 
+			fsd.root_dir.entry[0].inode_num,
+	                &root_dir_inode);
+    strncpy(fsd.root_dir.entry[0].name, 
+	    "/mnt_my_fs", strlen("/mnt_my_fs"));
+    
     return OK;
 }
 
