@@ -58,7 +58,8 @@ fs_get_inode_by_num(int dev, int inode_number, struct inode *in) {
     return SYSERR;
   }
   if (inode_number > fsd.ninodes) {
-    printf("fs_get_inode_by_num: inode %d out of range\n", inode_number);
+    printf("fs_get_inode_by_num: inode %d out of range\n", 
+	   inode_number);
     return SYSERR;
   }
 
@@ -131,7 +132,8 @@ int fs_mkfs(int dev, int num_inodes) {
   while ( (i % 8) != 0) {i++;}
   fsd.freemaskbytes = i / 8; 
   
-  if ((fsd.freemask = getmem(fsd.freemaskbytes)) == (void *)SYSERR) {
+  if ((fsd.freemask = getmem(fsd.freemaskbytes)) 
+      == (void *)SYSERR) {
     printf("fs_mkfs memget failed.\n");
     return SYSERR;
   }
