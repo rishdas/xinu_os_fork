@@ -34,6 +34,24 @@ int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 /* YOUR CODE GOES HERE */
 
+int fs_close(int fd)
+{
+    struct filetable *oftptr;
+
+    if ((fd < 0) || (fd > (NUM_FD-1))) {
+	printf ("Invalid file descriptor!\n");
+	return SYSERR;
+    }
+    oftptr = &oft[fd];
+    if (oftptr->state == FSTATE_CLOSED) {
+	printf ("File descriptor not open!\n");
+	return SYSERR;
+    }
+    oftptr->state = FSTATE_CLOSED;
+
+    return OK;
+}
+
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock) {
   int diskblock;
 
