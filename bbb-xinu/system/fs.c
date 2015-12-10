@@ -60,6 +60,7 @@ int fs_write(int fd, void *buf, int nbytes)
 	    }
 	    bl = fs_get_next_free_data_block();
 	    oftptr->in.blocks[f_bl] = bl;
+	    fs_setmaskbit(bl);
 	} else {
 	    bl = fs_fileblock_to_diskblock(dev0, fd, f_bl);
 	}
@@ -76,6 +77,7 @@ int fs_write(int fd, void *buf, int nbytes)
 	bs_bwrite(dev0, bl, 0, block_cache, fsd.blocksz);
 	oftptr->fileptr += cache_len;
     }
+    return nbytes;
 }
 int fs_read(int fd, void *buf, int nbytes)
 {

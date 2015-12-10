@@ -65,6 +65,7 @@ int fs_write(int fd, void *buf, int nbytes);
 /* filesystem functions */
 int fs_mkfs(int dev, int num_inodes);
 int fs_mount(int dev);
+int fs_get_next_free_data_block();
 
 /* filesystem internal functions */
 int fs_get_inode_by_num(int dev, int inode_number, struct inode *in);
