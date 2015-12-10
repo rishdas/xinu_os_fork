@@ -52,6 +52,8 @@ void fs_testbitmask(void);
     fs_mkfs(0,DEFAULT_NUM_INODES); /* bsdev 0*/
     fs_mount(0);
     fs_testbitmask();
+    fd = fs_create("Test_File", O_CREAT);
+    fd = fs_open("Test_File", O_CREAT);
 #ifdef FS_FUNC
     buf1 = getmem(SIZE*sizeof(char));
     buf2 = getmem(SIZE*sizeof(char));

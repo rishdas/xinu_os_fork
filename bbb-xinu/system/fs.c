@@ -155,6 +155,24 @@ int fs_create(char *filename, int mode)
 	    filename, strlen(filename));
     return OK;
 }
+int fs_open(char *filename, int mode)
+{
+    int inode_num;
+    int ret_val;
+    ret_val = fs_find_file(filename);
+    if (ret_val < 0) {
+	ret_val = fs_create(filename, mode);
+	if (ret_val == SYSERR) {
+	    return SYSERR;
+	}
+    }
+    inode_num = fsd.root_dir.entry[ret_val].inode_num;
+    fs_get_inode_by_num(0, inode_num, &oft[next_open_fd].in);
+    oft[next_open_fd].state = FSTATE_OPEN;
+    oft[next_open_fd].fileptr = 0;
+    oft[next_open_fd].de = &fsd.root_dir.entry[ret_val];
+    return next_open_fd++;
+}
 int fs_mount(int dev)
 {
     struct inode root_dir_inode;

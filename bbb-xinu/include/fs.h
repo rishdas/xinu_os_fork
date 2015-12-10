@@ -44,7 +44,6 @@ struct directory {
   int numentries;
   struct dirent entry[DIRECTORY_SIZE];
 };
-
 struct fsystem {
   int nblocks;
   int blocksz;
