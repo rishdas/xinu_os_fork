@@ -77,6 +77,7 @@ int fs_write(int fd, void *buf, int nbytes)
 	bs_bwrite(dev0, bl, 0, block_cache, fsd.blocksz);
 	oftptr->fileptr += cache_len;
     }
+    fs_put_inode_by_num(dev0, oftptr->in.id, &oftptr->in);
     return nbytes;
 }
 int fs_read(int fd, void *buf, int nbytes)
@@ -198,7 +199,7 @@ int fs_create(char *filename, int mode)
 	in.id;
     strncpy(fsd.root_dir.entry[fsd.root_dir.numentries-1].name, 
 	    filename, strlen(filename));
-    return OK;
+    return fs_open(filename, mode);
 }
 int fs_open(char *filename, int mode)
 {
@@ -248,6 +249,26 @@ int fs_mount(int dev)
 	    "/mnt_my_fs", strlen("/mnt_my_fs"));
     
     return OK;
+}
+
+int fs_seek(int fd, int offset)
+{
+    struct filetable *oftptr;
+    oftptr = &oft[fd];
+    if (oftptr->state == FSTATE_CLOSED) {
+	printf ("File descriptor not open!\n");
+	return SYSERR;
+    }
+    oftptr->fileptr += offset;
+    if (oftptr->fileptr > oftptr->in.size) {
+	oftptr->fileptr = oftptr->in.size;
+	return oftptr->fileptr;
+    }
+    if (oftptr->fileptr < 0) {
+	oftptr->fileptr = 0;
+	return oftptr->fileptr;
+    }
+    return oftptr->fileptr;
 }
 
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock) {
