@@ -33,7 +33,50 @@ int next_open_fd = 0;
 int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 
 /* YOUR CODE GOES HERE */
-
+int fs_write(int fd, void *buf, int nbytes)
+{
+    int bl,f_bl, f_off, cache_len;
+    struct filetable *oftptr;
+    int len = nbytes;
+    if ((fd < 0) || (fd > (NUM_FD-1))) {
+	printf ("Invalid file descriptor!\n");
+	return SYSERR;
+    }
+    if ((buf == NULL) || (nbytes < 1 )) {
+	return SYSERR;
+    }
+    
+    oftptr = &oft[fd];
+    if (oftptr->state == FSTATE_CLOSED) {
+	printf ("File descriptor not open!\n");
+	return SYSERR;
+    }
+    while (len != 0) {
+	f_bl = oftptr->fileptr/fsd.blocksz;
+	f_off = oftptr->fileptr%fsd.blocksz;
+	if (f_off == 0) {
+	    if (f_bl!=0) {
+		f_bl++;
+	    }
+	    bl = fs_get_next_free_data_block();
+	    oftptr->in.blocks[f_bl] = bl;
+	} else {
+	    bl = fs_fileblock_to_diskblock(dev0, fd, f_bl);
+	}
+	bs_bread(dev0, bl, 0, block_cache, fsd.blocksz);
+	if (f_off + len > fsd.blocksz) {
+	    cache_len = fsd.blocksz - f_off;
+	    len = len - cache_len;
+	} else {
+	    cache_len = len;
+	    len = 0;
+	}
+	memcpy(&block_cache[(f_off*sizeof(char))], buf, 
+	       fsd.blocksz-f_off);
+	bs_bwrite(dev0, bl, 0, block_cache, fsd.blocksz);
+	oftptr->fileptr += cache_len;
+    }
+}
 int fs_read(int fd, void *buf, int nbytes)
 {
     struct filetable *oftptr;
@@ -58,7 +101,7 @@ int fs_read(int fd, void *buf, int nbytes)
     }
     if (oftptr->fileptr >= oftptr->in.size) {
 	printf ("Attempted to read beyond EOF!\n");
-	return SYSERR;
+	return EOF;
     }
     /* if nbytes + 'cursor' > file size, */
     /* then adjust nbytes to amount of bytes to the file's end */
@@ -133,7 +176,7 @@ int fs_create_file_inode(struct inode *in)
     in->type = INODE_TYPE_FILE;
     in->device = 0;
     in->size = 0;
-    fs_put_inode_by_num(0, in->id, &in);
+    fs_put_inode_by_num(0, in->id, in);
     return OK;
 }
 int fs_create(char *filename, int mode)
@@ -261,7 +304,8 @@ fs_put_inode_by_num(int dev, int inode_number, struct inode *in) {
     return SYSERR;
   }
   if (inode_number > fsd.ninodes) {
-    printf("fs_put_inode_by_num: inode %d out of range\n", inode_number);
+    printf("fs_put_inode_by_num: inode %d out of range\n", 
+	   inode_number);
     return SYSERR;
   }
 
@@ -276,7 +320,8 @@ fs_put_inode_by_num(int dev, int inode_number, struct inode *in) {
       fs_setmaskbit(bl);
   }
   bs_bread(dev0, bl, 0, block_cache, fsd.blocksz);
-  memcpy(&block_cache[(inn*sizeof(struct inode))], in, sizeof(struct inode));
+  memcpy(&block_cache[(inn*sizeof(struct inode))], 
+	 in, sizeof(struct inode));
   bs_bwrite(dev0, bl, 0, block_cache, fsd.blocksz);
 
   return OK;
