@@ -13,8 +13,13 @@
 #define INODE_TYPE_FILE 1
 #define INODE_TYPE_DIR 2
 
-#define O_CREAT 0
+/* action flags */
+#define O_CREAT (1<<3)
 
+/* mode flags */
+#define O_RDONLY (1<<0)
+#define O_WRONLY (1<<1)
+#define O_RDWR   (1<<2)
 
 struct inode {
   int id;
@@ -31,6 +36,7 @@ struct inode {
 struct filetable {
   int state;
   int fileptr;
+  int flag;
   struct dirent *de;
   struct inode in;
 };
@@ -44,6 +50,7 @@ struct directory {
   int numentries;
   struct dirent entry[DIRECTORY_SIZE];
 };
+
 struct fsystem {
   int nblocks;
   int blocksz;
@@ -57,7 +64,7 @@ struct fsystem {
 /* file and directory functions */
 int fs_open(char *filename, int flags);
 int fs_close(int fd);
-int fs_create(char *filename, int mode);
+int fs_create(char *filename);
 int fs_seek(int fd, int offset);
 int fs_read(int fd, void *buf, int nbytes);
 int fs_write(int fd, void *buf, int nbytes);

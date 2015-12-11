@@ -189,6 +189,7 @@ int fs_close(int fd)
 int fs_find_file(char *filename)
 {
     int i = 0;
+
     for (i = 0; i < fsd.root_dir.numentries; i++) {
 	if (strncmp(fsd.root_dir.entry[i].name, 
 		    filename, strlen(filename)) == 0) {
@@ -205,9 +206,11 @@ int fs_create_file_inode(struct inode *in)
     in->type = INODE_TYPE_FILE;
     in->device = dev0;
     in->size = 0;
-    fs_put_inode_by_num(0, in->id, in);
+    fs_put_inode_by_num(dev0, in->id, in);
     return OK;
 }
+
+/*
 int fs_create(char *filename, int mode)
 {
     int ret_val = 0;
@@ -227,24 +230,44 @@ int fs_create(char *filename, int mode)
 	    filename, strlen(filename));
     return fs_open(filename, mode);
 }
-int fs_open(char *filename, int mode)
+*/
+int fs_create(char *filename)
+{
+    return fs_open (filename, O_WRONLY | O_CREAT);
+}
+
+int fs_open(char *filename, int flags)
 {
     int inode_num;
     int ret_val;
+
     ret_val = fs_find_file(filename);
+
     if (ret_val < 0) {
-	ret_val = fs_create(filename, mode);
-	if (ret_val == SYSERR) {
+	if (flags & O_CREAT) {
+	    /* file not exist and must be created */
+	    fs_create_file_inode(&in);
+	    fsd.root_dir.numentries += 1;
+	    inode_num = fsd.root_dir.entry[fsd.root_dir.numentries-1].inode_num =
+		in.id;
+	    strncpy(fsd.root_dir.entry[fsd.root_dir.numentries-1].name,
+		    filename, strlen(filename));
+ 	} else {
+	    printf ("File not found!\n");
 	    return SYSERR;
 	}
+    } else {			/* if found */
+	inode_num = fsd.root_dir.entry[ret_val].inode_num;
     }
-    inode_num = fsd.root_dir.entry[ret_val].inode_num;
-    fs_get_inode_by_num(0, inode_num, &oft[next_open_fd].in);
+
+    fs_get_inode_by_num(dev0, inode_num, &oft[next_open_fd].in);
     oft[next_open_fd].state = FSTATE_OPEN;
     oft[next_open_fd].fileptr = 0;
+    oft[next_open_fd].flag = (flags & ~O_CREAT);
     oft[next_open_fd].de = &fsd.root_dir.entry[ret_val];
     return next_open_fd++;
 }
+
 int fs_mount(int dev)
 {
     struct inode root_dir_inode;

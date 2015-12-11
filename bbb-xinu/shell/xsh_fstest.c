@@ -102,7 +102,7 @@ void fs_testbitmask(void);
     buf2 = getmem(SIZE*sizeof(char));
     
     // Create test file
-    fd = fs_create("Test_File", O_CREAT);
+    fd = fs_create("Test_File");
        
     // Fill buffer with random stuff
     for(i=0; i<SIZE; i++)
