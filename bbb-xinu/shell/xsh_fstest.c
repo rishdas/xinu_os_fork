@@ -95,7 +95,7 @@ void fs_testbitmask(void);
     printf("\n+++++++++++++++++++++\n");
     printf("%s\n", buf2);
     
-//    fs_testbitmask();
+    fs_testbitmask();
 
 #ifdef FS_FUNC
     buf1 = getmem(SIZE*sizeof(char));

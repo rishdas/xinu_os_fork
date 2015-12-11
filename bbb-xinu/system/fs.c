@@ -83,6 +83,7 @@ int fs_write(int fd, void *buf, int nbytes)
     fs_put_inode_by_num(dev0, oftptr->in.id, &oftptr->in);
     return tot_len_write;
 }
+
 int fs_read(int fd, void *buf, int nbytes)
 {
     struct filetable *oftptr;
@@ -202,7 +203,7 @@ int fs_create_file_inode(struct inode *in)
     fsd.inodes_used += 1;
     in->id = fsd.inodes_used;
     in->type = INODE_TYPE_FILE;
-    in->device = 0;
+    in->device = dev0;
     in->size = 0;
     fs_put_inode_by_num(0, in->id, in);
     return OK;
