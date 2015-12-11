@@ -36,6 +36,7 @@ int fs_fileblock_to_diskblock(int dev, int fd, int fileblock);
 int fs_write(int fd, void *buf, int nbytes)
 {
     int bl,f_bl, f_off, cache_len;
+    int tot_len_write = 0;
     struct filetable *oftptr;
     int len = nbytes;
     if ((fd < 0) || (fd > (NUM_FD-1))) {
@@ -55,10 +56,9 @@ int fs_write(int fd, void *buf, int nbytes)
 	f_bl = oftptr->fileptr/fsd.blocksz;
 	f_off = oftptr->fileptr%fsd.blocksz;
 	if (f_off == 0) {
-	    if (f_bl!=0) {
-		f_bl++;
-	    }
 	    bl = fs_get_next_free_data_block();
+	    printf("File Block: %d Disk BLock: %d\n", 
+		   f_bl, bl);
 	    oftptr->in.blocks[f_bl] = bl;
 	    fs_setmaskbit(bl);
 	} else {
@@ -72,13 +72,16 @@ int fs_write(int fd, void *buf, int nbytes)
 	    cache_len = len;
 	    len = 0;
 	}
-	memcpy(&block_cache[(f_off*sizeof(char))], buf, 
-	       fsd.blocksz-f_off);
+	memcpy(&block_cache[(f_off*sizeof(char))], 
+	       buf + tot_len_write, 
+	       cache_len);
 	bs_bwrite(dev0, bl, 0, block_cache, fsd.blocksz);
 	oftptr->fileptr += cache_len;
+	tot_len_write += cache_len;
     }
+    oftptr->in.size = oftptr->fileptr;
     fs_put_inode_by_num(dev0, oftptr->in.id, &oftptr->in);
-    return nbytes;
+    return tot_len_write;
 }
 int fs_read(int fd, void *buf, int nbytes)
 {
@@ -87,7 +90,8 @@ int fs_read(int fd, void *buf, int nbytes)
     int fileblock;
     int offset;
     int diskblock;
-    
+    int len_read = nbytes;
+    int tot_len_read = 0;
     
     if ((fd < 0) || (fd > (NUM_FD-1))) {
 	printf ("Invalid file descriptor!\n");
@@ -103,7 +107,8 @@ int fs_read(int fd, void *buf, int nbytes)
 	return SYSERR;
     }
     if (oftptr->fileptr >= oftptr->in.size) {
-	printf ("Attempted to read beyond EOF!\n");
+	printf ("Attempted to read beyond EOF! %d %d\n",
+		oftptr->fileptr, oftptr->in.size);
 	return EOF;
     }
     /* if nbytes + 'cursor' > file size, */
@@ -111,24 +116,44 @@ int fs_read(int fd, void *buf, int nbytes)
     if ((oftptr->fileptr + nbytes) > oftptr->in.size) {
 	nbytes = oftptr->in.size - oftptr->fileptr;
     }
-
+    len_read = nbytes;
     blocksz = fsd.blocksz;
     /* get the file block that the 'cursor' points */
-    fileblock = oftptr->fileptr / blocksz;
-    /* get the file offset */
-    offset = oftptr->fileptr % blocksz;
-    /* get the actual disk block */
-    diskblock = fs_fileblock_to_diskblock (0, fd, fileblock);
-    /* read the disk block */
-    if ( (bs_bread (0, diskblock, offset, buf, nbytes)) 
-	 == SYSERR ) {
-	printf ("bs_read() error!\n");
-	return SYSERR;
+    while (tot_len_read < nbytes) {
+	fileblock = oftptr->fileptr / blocksz;
+	/* get the file offset */
+	offset = oftptr->fileptr % blocksz;
+	/* get the actual disk block */
+	/* printf("fileblock: %d, fileptr: %d Offset: %d\n", */
+	/*        fileblock, oftptr->fileptr, offset); */
+	diskblock = fs_fileblock_to_diskblock (0, fd,
+					       fileblock);
+
+	printf("\nDisk Block: %d\n", diskblock);
+
+	if (offset + len_read > blocksz) {
+	    len_read = blocksz - offset;
+	}
+	/* read the disk block */
+	if ( (bs_bread (0, diskblock, offset, block_cache,
+			len_read)) 
+	     == SYSERR ) {
+	    printf ("bs_read() error!\n");
+	    return SYSERR;
+	}
+	printf("blockcache: %s \nlen_read: %d\n", 
+	       block_cache, len_read);
+	memcpy((buf + tot_len_read), 
+	       &block_cache[(offset*sizeof(char))],	       
+	       len_read);
+	/* advances the 'cursor' */
+	oftptr->fileptr += len_read;
+	tot_len_read += len_read;
+	len_read = nbytes - tot_len_read;
+	printf("\nLen_read: %d\n", len_read);
     }
-    /* advances the 'cursor' */
-    oftptr->fileptr += nbytes;
-    
-    return nbytes;
+    *((char *)(buf+tot_len_read)) = '\0';
+    return tot_len_read;
 }
 
 int fs_get_next_free_data_block()
