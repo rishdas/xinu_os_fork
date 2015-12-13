@@ -39,6 +39,7 @@ int fs_write(int fd, void *buf, int nbytes)
     int tot_len_write = 0;
     struct filetable *oftptr;
     int len = nbytes;
+
     if ((fd < 0) || (fd > (NUM_FD-1))) {
 	printf ("Invalid file descriptor!\n");
 	return SYSERR;
@@ -46,10 +47,13 @@ int fs_write(int fd, void *buf, int nbytes)
     if ((buf == NULL) || (nbytes < 1 )) {
 	return SYSERR;
     }
-    
     oftptr = &oft[fd];
     if (oftptr->state == FSTATE_CLOSED) {
 	printf ("File descriptor not open!\n");
+	return SYSERR;
+    }
+    if (oftptr->flag == O_RDONLY) {
+	printf ("Write operation not allowed!\n");
 	return SYSERR;
     }
     while (len != 0) {
@@ -105,6 +109,10 @@ int fs_read(int fd, void *buf, int nbytes)
     oftptr = &oft[fd];
     if (oftptr->state == FSTATE_CLOSED) {
 	printf ("File descriptor not open!\n");
+	return SYSERR;
+    }
+    if (oftptr->flag == O_WRONLY) {
+	printf ("Read operation not allowed!\n");
 	return SYSERR;
     }
     if (oftptr->fileptr >= oftptr->in.size) {
@@ -238,6 +246,7 @@ int fs_create(char *filename)
 
 int fs_open(char *filename, int flags)
 {
+    struct inode in;
     int inode_num;
     int ret_val;
 
@@ -253,7 +262,7 @@ int fs_open(char *filename, int flags)
 	    strncpy(fsd.root_dir.entry[fsd.root_dir.numentries-1].name,
 		    filename, strlen(filename));
  	} else {
-	    printf ("File not found!\n");
+	    printf ("fs_open(): File not found!\n");
 	    return SYSERR;
 	}
     } else {			/* if found */

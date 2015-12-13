@@ -51,7 +51,7 @@ void fs_testbitmask(void);
     bs_mkdev(0, MDEV_BLOCK_SIZE, MDEV_NUM_BLOCKS); /* device "0" and default blocksize (=0) and count */
     fs_mkfs(0,DEFAULT_NUM_INODES); /* bsdev 0*/
     fs_mount(0);
-    fd = fs_create("Test_File", O_CREAT);
+    fd = fs_create("Test_File");
     buf1 = getmem(SIZE*sizeof(char));
     buf2 = getmem(SIZE*sizeof(char));
 
@@ -62,7 +62,7 @@ void fs_testbitmask(void);
     /*     j = j+33; */
     /*     buf1[i] = (char) j; */
     /* } */
-    buf1 = "TLmVDUDGDKLoNPrMSnuLdzrO4Erwdocfj55rEcR5nzG76FpAU0"\
+    strncpy (buf1,"TLmVDUDGDKLoNPrMSnuLdzrO4Erwdocfj55rEcR5nzG76FpAU0"	\
 "jbLlEeKl7B3CbSZvhD8KP1a3mhaRWzF8kVPdBaOeroB5hq0J5mg0Hp0y0"\
 "YiiMfbRFWQbDlHRNdNCOppqljGL8m9oDcDvajiJlwdOVjrKRO6fuPSujbqA"\
 "JTgnbNKuEnz6Be8euhkGK6EeTSnNAVua2Quj8YqTCcdExSJBRTAuD33N8sxz"\
@@ -82,7 +82,7 @@ void fs_testbitmask(void);
 "qbiSLSxxhkg0aWBwtwdnBOv0VXTbiN8vbuYCYtPHGDadNKdI7Hv9eLMGal"\
 "36OktMzZba3ocvaVyWifU3np5Bq4VnOQjaF0bpNtMxYlMDy503Rf9smW7M"\
 "vZUxuele1GEnTBhG0BNpJ5jfNuWRmAftT3mq1QBLpY8RLXHK69PaaJ0rAh"\
-	"U1TOHuf9d7YgzfdZmk51gIbWBK4y7BtmgkO8nPWN6Ls8Tp";
+	     "U1TOHuf9d7YgzfdZmk51gIbWBK4y7BtmgkO8nPWN6Ls8Tp",SIZE);
     
     rval = fs_write(fd,buf1,SIZE);
     if(rval == 0 || rval != SIZE )
@@ -90,12 +90,24 @@ void fs_testbitmask(void);
         printf("\n\r File write failed");
     }
     printf("%s\n", buf1);
-    fs_seek(fd,-SIZE);
+    fs_close(fd);
+
+    fd = fs_open ("Test_File", O_RDONLY);
+    /* fs_seek(fd,-SIZE); */
     rval = fs_read(fd, buf2, rval);
     printf("\n+++++++++++++++++++++\n");
     printf("%s\n", buf2);
     
-    fs_testbitmask();
+    fs_seek(fd,-SIZE);
+    rval = fs_read(fd, buf2, rval);
+    printf("\n+++++++++++++++++++++\n");
+    printf("%s\n", buf2);
+    fs_close(fd);
+
+    //fs_testbitmask();
+#endif
+
+    return OK;
 
 #ifdef FS_FUNC
     buf1 = getmem(SIZE*sizeof(char));
@@ -127,7 +139,7 @@ void fs_testbitmask(void);
     rval = fs_read(fd, buf2, rval);
     buf2[rval] = EOF; // TODO: Write end of file symbol i.e. slash-zero instead of EOF. I can not do this because of WIKI editor limitation    
 
-    if(rval == 0)
+    if(rval == SYSERR)
     {
         printf("\n\r File read failed");
         goto clean_up;
@@ -145,10 +157,11 @@ clean_up:
     freemem(buf1,SIZE);
     freemem(buf2,SIZE);
 #endif
+/*
 #else
     printf("No filesystem support\n");
 #endif
-
+*/
     return OK;
 }
 
