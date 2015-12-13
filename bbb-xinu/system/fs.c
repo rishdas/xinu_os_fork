@@ -41,7 +41,7 @@ int fs_write(int fd, void *buf, int nbytes)
     int len = nbytes;
 
     if ((fd < 0) || (fd > (NUM_FD-1))) {
-	printf ("Invalid file descriptor!\n");
+	printf ("fs_write: Invalid file descriptor!\n");
 	return SYSERR;
     }
     if ((buf == NULL) || (nbytes < 1 )) {
@@ -49,11 +49,11 @@ int fs_write(int fd, void *buf, int nbytes)
     }
     oftptr = &oft[fd];
     if (oftptr->state == FSTATE_CLOSED) {
-	printf ("File descriptor not open!\n");
+	printf ("fs_write: File descriptor not open!\n");
 	return SYSERR;
     }
     if (oftptr->flag == O_RDONLY) {
-	printf ("Write operation not allowed!\n");
+	printf ("fs_write: Write operation not allowed!\n");
 	return SYSERR;
     }
     while (len != 0) {
@@ -99,7 +99,7 @@ int fs_read(int fd, void *buf, int nbytes)
     int tot_len_read = 0;
     
     if ((fd < 0) || (fd > (NUM_FD-1))) {
-	printf ("Invalid file descriptor!\n");
+	printf ("fs_read: Invalid file descriptor!\n");
 	return SYSERR;
     }
     if ((buf == NULL) || (nbytes < 1 )) {
@@ -108,15 +108,15 @@ int fs_read(int fd, void *buf, int nbytes)
     
     oftptr = &oft[fd];
     if (oftptr->state == FSTATE_CLOSED) {
-	printf ("File descriptor not open!\n");
+	printf ("fs_read: File descriptor not open!\n");
 	return SYSERR;
     }
     if (oftptr->flag == O_WRONLY) {
-	printf ("Read operation not allowed!\n");
+	printf ("fs_read: Read operation not allowed!\n");
 	return SYSERR;
     }
     if (oftptr->fileptr >= oftptr->in.size) {
-	printf ("Attempted to read beyond EOF! %d %d\n",
+	printf ("fs_read: Attempted to read beyond EOF! %d %d\n",
 		oftptr->fileptr, oftptr->in.size);
 	return EOF;
     }
@@ -182,12 +182,12 @@ int fs_close(int fd)
     struct filetable *oftptr;
 
     if ((fd < 0) || (fd > (NUM_FD-1))) {
-	printf ("Invalid file descriptor!\n");
+	printf ("fs_close: Invalid file descriptor!\n");
 	return SYSERR;
     }
     oftptr = &oft[fd];
     if (oftptr->state == FSTATE_CLOSED) {
-	printf ("File descriptor not open!\n");
+	printf ("fs_close: File descriptor not open!\n");
 	return SYSERR;
     }
     oftptr->state = FSTATE_CLOSED;
@@ -262,7 +262,7 @@ int fs_open(char *filename, int flags)
 	    strncpy(fsd.root_dir.entry[fsd.root_dir.numentries-1].name,
 		    filename, strlen(filename));
  	} else {
-	    printf ("fs_open(): File not found!\n");
+	    printf ("fs_open: File not found!\n");
 	    return SYSERR;
 	}
     } else {			/* if found */
@@ -282,7 +282,7 @@ int fs_mount(int dev)
     struct inode root_dir_inode;
     int ret_val;
     if (dev != 0) {
-	printf("Unsupported device\n");
+	printf("fs_mount: Unsupported device\n");
 	return SYSERR;
     }
     fsd.inodes_used += 1;
@@ -314,7 +314,7 @@ int fs_seek(int fd, int offset)
     struct filetable *oftptr;
     oftptr = &oft[fd];
     if (oftptr->state == FSTATE_CLOSED) {
-	printf ("File descriptor not open!\n");
+	printf ("fs_seek: File descriptor not open!\n");
 	return SYSERR;
     }
     oftptr->fileptr += offset;
