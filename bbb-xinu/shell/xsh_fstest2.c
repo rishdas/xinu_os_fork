@@ -8,7 +8,7 @@ shellcmd xsh_fstest2(int nargs, char *args[])
 {
     int rval;
     int fd, i, j;
-    char *buf1, *buf2;
+    char *buf1, *buf2, *buf3;
     
     
     /* Output help, if '--help' argument was supplied */
@@ -43,15 +43,10 @@ shellcmd xsh_fstest2(int nargs, char *args[])
     bs_mkdev(0, MDEV_BLOCK_SIZE, MDEV_NUM_BLOCKS); /* device "0" and default blocksize (=0) and count */
     fs_mkfs(0,DEFAULT_NUM_INODES); /* bsdev 0*/
     fs_mount(0);
-    printf ("Testing fs_create...\n");
-    fd = fs_create("Test_File");
-    if (fd == SYSERR) {
-	printf ("fs_create: failed\n");
-	return -1;
-    }
 
     buf1 = getmem(SIZE*sizeof(char));
     buf2 = getmem(SIZE*sizeof(char));
+    buf3 = getmem(2*SIZE*sizeof(char));
     strncpy (buf1,"TLmVDUDGDKLoNPrMSnuLdzrO4Erwdocfj55rEcR5nzG76FpAU0"	\
 	     "jbLlEeKl7B3CbSZvhD8KP1a3mhaRWzF8kVPdBaOeroB5hq0J5mg0Hp0y0"\
 	     "YiiMfbRFWQbDlHRNdNCOppqljGL8m9oDcDvajiJlwdOVjrKRO6fuPSujbqA"\
@@ -73,21 +68,41 @@ shellcmd xsh_fstest2(int nargs, char *args[])
 	     "36OktMzZba3ocvaVyWifU3np5Bq4VnOQjaF0bpNtMxYlMDy503Rf9smW7M"\
 	     "vZUxuele1GEnTBhG0BNpJ5jfNuWRmAftT3mq1QBLpY8RLXHK69PaaJ0rAh"\
 	     "U1TOHuf9d7YgzfdZmk51gIbWBK4y7BtmgkO8nPWN6Ls8Tp",SIZE);
+    /*
+     * testing fs_create(): fs_write() must work, fs_read() must fail
+     */
+    printf ("Testing fs_create...\n");
+    fd = fs_create("Test_File");
+    if (fd == SYSERR) {
+	printf ("fs_create: failed\n");
+	return -1;
+    }
     rval = fs_write(fd,buf1,SIZE);
     if(rval == SYSERR || rval == 0 || rval != SIZE )
     {
         printf("\n\r File write failed: rval = %d\n", rval);
     }
     printf("%s\n", buf1);
+    printf ("Testing fs_read... must fail...\n");
+    bzero (buf2, SIZE);
+    rval = fs_read(fd, buf2, rval);
+    if (rval == SYSERR) {
+	printf ("fs_read: failed... GOOD!\n");
+    } else {
+        printf("fs_read: Not failed. BAD! :-(\n");
+	return -1;
+    }
     fs_close(fd);
 
+    /*
+     * testing fs_open() with O_RDONLY: fs_read() must work, fs_write() must fail 
+     */
     printf ("Testing fs_open with O_RDONLY...\n");
     fd = fs_open ("Test_File", O_RDONLY);
     if (fd == SYSERR) {
 	printf ("fs_open: failed\n");
 	return -1;
     }
-    /* fs_seek(fd,-SIZE); */
     printf ("Testing fs_read...\n");
     bzero (buf2, SIZE);
     rval = fs_read(fd, buf2, rval);
@@ -133,7 +148,61 @@ shellcmd xsh_fstest2(int nargs, char *args[])
         printf("fs_write: Not failed. BAD! :-(\n");
 	return -1;
     }
+    fs_close(fd);
 
+    /*
+     * testing fs_open() with O_WRONLY: fs_read() must fail, fs_write() must work 
+     */
+    printf ("Testing fs_open with O_WRONLY...\n");
+    fd = fs_open ("Test_File", O_WRONLY);
+    if (fd == SYSERR) {
+	printf ("fs_open: failed\n");
+	return -1;
+    }
+    /* go to the end of the file */
+    fs_seek(fd,SIZE);
+    rval = fs_write(fd,buf1,SIZE);
+    if(rval == SYSERR)
+    {
+        printf("fs_write: failed\n");
+	return -1;
+    }
+    printf ("Testing fs_read...\n");
+    bzero (buf2, SIZE);
+    fs_seek(fd,-SIZE);
+    rval = fs_read(fd, buf2, SIZE);
+    if (rval == SYSERR) {
+	printf ("fs_read: failed... GOOD!!\n");
+    }
+    fs_close(fd);
+
+    /*
+     * testing fs_open() with O_RDWR: fs_read() must work, fs_write() must work 
+     */
+    printf ("Testing fs_open with O_RDWR...\n");
+    fd = fs_open ("Test_File", O_RDWR);
+    if (fd == SYSERR) {
+	printf ("fs_open: failed\n");
+	return -1;
+    }
+    printf ("Testing fs_read...\n");
+    bzero (buf3, 2*SIZE);
+    rval = fs_read(fd, buf3, 2*SIZE);
+    if (rval == SYSERR) {
+	printf ("fs_read: failed\n");
+    }
+    printf("\n+++++++++++++++++++++\n");
+    printf("%s\n", buf3);
+    fs_seek (fd, -2*SIZE);
+    bzero (buf1,SIZE);
+    strncpy (buf1,"The quick brown fox jumps over the lazy dog.",
+	     strlen ("The quick brown fox jumps over the lazy dog."));
+    rval = fs_write(fd,buf1,SIZE);
+    if(rval == SYSERR)
+    {
+        printf("fs_write: failed\n");
+	return -1;
+    }
     fs_close(fd);
 
     fs_testbitmask2();
@@ -141,6 +210,8 @@ shellcmd xsh_fstest2(int nargs, char *args[])
 clean_up:
     freemem(buf1,SIZE);
     freemem(buf2,SIZE);
+    freemem(buf3,2*SIZE);
+
 
 #endif
 
