@@ -91,5 +91,8 @@ extern  shellcmd  xsh_freemem    (int32, char *[]);
 /* in file xsh_talk.c */
 extern  shellcmd  xsh_talk    (int32, char *[]);
 
-/* in file xsh_talk.c */
+/* in file xsh_fstest.c */
 extern  shellcmd  xsh_fstest  (int32, char *[]);
+
+/* in file xsh_fstest2.c */
+extern  shellcmd  xsh_fstest2  (int32, char *[]);
