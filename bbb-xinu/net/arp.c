@@ -251,6 +251,7 @@ void	arp_in (
 		arptr = &arpcache[slot];
 		arptr->arpaddr = pktptr->arp_sndpa;
 		memcpy(arptr->arhaddr, pktptr->arp_sndha, ARP_HALEN);
+		arptr->arptime = clktime;
 		arptr->arstate = AR_RESOLVED;
 	}
 
@@ -354,4 +355,29 @@ void 	arp_hton(
 	pktptr->arp_op    = htons(pktptr->arp_op);
 	pktptr->arp_sndpa = htonl(pktptr->arp_sndpa);
 	pktptr->arp_tarpa = htonl(pktptr->arp_tarpa);
+}
+
+/*------------------------------------------------------------------------
+ * arp_check  -  Check for old ARP entries
+ *------------------------------------------------------------------------
+ */
+void	arp_check(void)
+{
+	int32	i;			/* ARP cache index		*/
+	struct	arpentry  *arptr;	/* Ptr to ARP cache entry	*/
+	intmask	mask;			/* Saved interrupt mask		*/
+	
+	mask = disable ();
+
+	for (i=0; i<ARP_SIZ; i++) {	
+	    arptr = &arpcache[i];
+	    if (arptr->arstate == AR_RESOLVED) { /* If state is RESOLVED */
+		if ((clktime - arptr->arptime) > 300) { /* and time elapsed more than 5 mins */
+		    arptr->arstate = AR_FREE;
+		    memset((char *)arptr, NULLCH, sizeof(struct arpentry));
+		}
+	    }	    
+	}
+	restore (mask);
+	return;
 }

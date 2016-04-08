@@ -29,8 +29,8 @@ syscall	kill(
 	for (i=0; i<3; i++) {
 		close(prptr->prdesc[i]);
 	}
-	printf ("\n\nProcess %s used %u bytes in stack.\n",
-		 (int32)prptr->prname,stkusedsize(prptr->prstkbase, prptr->prstklen));
+	/* printf ("\n\nProcess %s used %u bytes in stack.\n",
+	   (int32)prptr->prname,stkusedsize(prptr->prstkbase, prptr->prstklen));*/
 	freestk(prptr->prstkbase, prptr->prstklen);
 
 	switch (prptr->prstate) {

@@ -12,10 +12,12 @@
 #define FUTURE_EXCLUSIVE  1
 #define FUTURE_SHARED     2
 #define FUTURE_QUEUE      3	
+#define LINE_LEN         255
 
 typedef struct futent
 {
     int   value;
+    char  str[LINE_LEN];
     int   flag;
     int   state;
     pid32 pid;
@@ -32,6 +34,8 @@ fut32 future_alloc(int future_flags);
 syscall future_free(fut32 fut);
 syscall future_get(fut32, int*);
 syscall future_set(fut32, int*);
+syscall future_get_str(fut32, int*, char*);
+syscall future_set_str(fut32, int*, char*);
 
 #define	isbadfut(f)	((int32)(f) < 0 || (f) >= NFUTURES) 
 #endif /* _FUTURE_H_ */

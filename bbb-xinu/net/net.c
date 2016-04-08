@@ -92,6 +92,9 @@ process	netin ()
 
 		eth_ntoh(pkt);
 
+		/* Check whenever any ARP entry has expired */
+		arp_check ();
+
 		/* Demultiplex on Ethernet type */
 
 		switch (pkt->net_ethtype) {
